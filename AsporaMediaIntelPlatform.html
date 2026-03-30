@@ -1,0 +1,1964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aspora Media Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #06080f;
+  --surface: #0d1117;
+  --surface2: #161b26;
+  --surface3: #1e2535;
+  --border: #2a3245;
+  --accent: #00d4ff;
+  --accent2: #7c3aed;
+  --accent3: #10b981;
+  --accent4: #f59e0b;
+  --accent5: #ef4444;
+  --text: #e2e8f0;
+  --text2: #94a3b8;
+  --text3: #64748b;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; overflow-x:hidden; }
+
+/* HEADER */
+header {
+  background: linear-gradient(135deg, #06080f 0%, #0d1117 50%, #0a0f1a 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(20px);
+}
+.header-inner { display:flex; align-items:center; justify-content:space-between; height:64px; max-width:1600px; margin:0 auto; }
+.logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.2rem; letter-spacing:0.05em; }
+.logo span { color:var(--accent); }
+.logo small { font-size:0.65rem; font-weight:400; color:var(--text3); display:block; letter-spacing:0.15em; text-transform:uppercase; margin-top:-2px; }
+.header-meta { display:flex; align-items:center; gap:1.5rem; }
+.live-badge { display:flex; align-items:center; gap:6px; font-size:0.72rem; color:var(--accent3); font-weight:500; letter-spacing:0.08em; text-transform:uppercase; }
+.live-dot { width:6px; height:6px; background:var(--accent3); border-radius:50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+.filters { display:flex; gap:0.75rem; }
+select {
+  background:var(--surface2); border:1px solid var(--border); color:var(--text2);
+  padding:0.4rem 0.75rem; border-radius:6px; font-size:0.8rem; font-family:'Inter',sans-serif;
+  cursor:pointer; outline:none; transition:border-color 0.2s;
+}
+select:hover { border-color:var(--accent); }
+
+/* NAV TABS */
+nav { background:var(--surface); border-bottom:1px solid var(--border); padding:0 2rem; position:sticky; top:0; z-index:100; }
+.nav-inner { display:flex; gap:0; max-width:1600px; margin:0 auto; overflow-x:auto; scrollbar-width:none; }
+.tab-btn {
+  padding:0.9rem 1.25rem; font-size:0.82rem; font-weight:500; color:var(--text3);
+  border:none; background:none; cursor:pointer; white-space:nowrap;
+  border-bottom:2px solid transparent; transition:all 0.2s; letter-spacing:0.03em;
+  display:flex; align-items:center; gap:6px;
+}
+.tab-btn:hover { color:var(--text); }
+.tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+.tab-icon { font-size:0.9rem; }
+
+/* MAIN */
+main { max-width:1600px; margin:0 auto; padding:1.5rem 2rem; }
+.section { display:none; }
+.section.active { display:block; }
+
+/* SECTION HEADER */
+.section-hdr { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:1.5rem; }
+.section-title { font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:700; }
+.section-title small { display:block; font-family:'Inter',sans-serif; font-size:0.8rem; font-weight:400; color:var(--text3); margin-top:2px; }
+.period-badge { font-family:'DM Mono',monospace; font-size:0.72rem; color:var(--text3); background:var(--surface2); border:1px solid var(--border); padding:0.3rem 0.75rem; border-radius:4px; }
+
+/* KPI CARDS */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:1.5rem; }
+.kpi-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  padding:1.25rem; position:relative; overflow:hidden; transition:border-color 0.2s;
+}
+.kpi-card:hover { border-color:var(--accent); }
+.kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.kpi-card.blue::before { background:linear-gradient(90deg, var(--accent), transparent); }
+.kpi-card.purple::before { background:linear-gradient(90deg, var(--accent2), transparent); }
+.kpi-card.green::before { background:linear-gradient(90deg, var(--accent3), transparent); }
+.kpi-card.amber::before { background:linear-gradient(90deg, var(--accent4), transparent); }
+.kpi-card.red::before { background:linear-gradient(90deg, var(--accent5), transparent); }
+.kpi-label { font-size:0.72rem; color:var(--text3); text-transform:uppercase; letter-spacing:0.1em; font-weight:500; margin-bottom:0.5rem; }
+.kpi-value { font-family:'Syne',sans-serif; font-size:2rem; font-weight:700; line-height:1; }
+.kpi-value.blue { color:var(--accent); }
+.kpi-value.purple { color:var(--accent2); }
+.kpi-value.green { color:var(--accent3); }
+.kpi-value.amber { color:var(--accent4); }
+.kpi-value.red { color:var(--accent5); }
+.kpi-sub { font-size:0.75rem; color:var(--text3); margin-top:0.4rem; display:flex; align-items:center; gap:4px; }
+.kpi-delta { font-size:0.72rem; font-weight:600; }
+.kpi-delta.up { color:var(--accent3); }
+.kpi-delta.down { color:var(--accent5); }
+
+/* CHARTS ROW */
+.charts-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
+.charts-row.three { grid-template-columns:1fr 1fr 1fr; }
+.charts-row.big { grid-template-columns:2fr 1fr; }
+.chart-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.25rem;
+}
+.chart-card.full { grid-column: 1/-1; }
+.chart-title { font-size:0.8rem; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:1rem; display:flex; align-items:center; justify-content:space-between; }
+.chart-wrap { position:relative; }
+.chart-wrap canvas { max-height:280px; }
+
+/* TABLE */
+.data-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+.data-table th {
+  text-align:left; padding:0.6rem 1rem; font-size:0.72rem; font-weight:600; color:var(--text3);
+  text-transform:uppercase; letter-spacing:0.08em; border-bottom:1px solid var(--border);
+  background:var(--surface2);
+}
+.data-table td { padding:0.65rem 1rem; border-bottom:1px solid rgba(42,50,69,0.5); color:var(--text2); }
+.data-table tr:hover td { background:var(--surface2); }
+.data-table .mono { font-family:'DM Mono',monospace; font-size:0.78rem; }
+.bar-cell { display:flex; align-items:center; gap:8px; }
+.mini-bar { height:4px; background:var(--accent); border-radius:2px; min-width:4px; }
+.mini-bar.green { background:var(--accent3); }
+.mini-bar.purple { background:var(--accent2); }
+.badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:600; }
+.badge.green { background:rgba(16,185,129,0.15); color:var(--accent3); }
+.badge.blue { background:rgba(0,212,255,0.1); color:var(--accent); }
+.badge.amber { background:rgba(245,158,11,0.15); color:var(--accent4); }
+
+/* BENCHMARK ROW */
+.benchmark-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:1rem; margin-bottom:1rem; }
+.bench-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.25rem;
+}
+.bench-title { font-size:0.78rem; color:var(--text3); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; margin-bottom:1rem; }
+.bench-item { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem; }
+.bench-label { font-size:0.82rem; color:var(--text2); display:flex; align-items:center; gap:8px; }
+.bench-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.bench-values { display:flex; align-items:center; gap:12px; }
+.bench-num { font-family:'DM Mono',monospace; font-size:0.82rem; }
+.bench-industry { font-size:0.72rem; color:var(--text3); font-family:'DM Mono',monospace; }
+.bench-bar-wrap { height:4px; background:var(--surface3); border-radius:2px; margin-top:4px; overflow:hidden; }
+.bench-bar { height:100%; border-radius:2px; transition:width 0.5s ease; }
+
+/* GEO */
+.geo-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.state-list { list-style:none; }
+.state-item { display:flex; align-items:center; justify-content:space-between; padding:0.6rem 0; border-bottom:1px solid rgba(42,50,69,0.4); }
+.state-name { font-size:0.82rem; color:var(--text2); }
+.state-metrics { display:flex; gap:1rem; }
+.state-metric { font-family:'DM Mono',monospace; font-size:0.75rem; }
+.state-metric span { color:var(--text3); font-size:0.7rem; margin-right:2px; }
+
+/* DIVIDER */
+.row-gap { margin-bottom:1rem; }
+
+/* INVENTORY SELECTOR */
+.inv-pills { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+.pill {
+  padding:0.4rem 1rem; border-radius:20px; font-size:0.78rem; cursor:pointer; font-weight:500;
+  border:1px solid var(--border); color:var(--text3); background:var(--surface2); transition:all 0.2s;
+}
+.pill:hover { border-color:var(--accent); color:var(--text); }
+.pill.active { background:rgba(0,212,255,0.12); border-color:var(--accent); color:var(--accent); }
+.pill.green.active { background:rgba(16,185,129,0.12); border-color:var(--accent3); color:var(--accent3); }
+.pill.purple.active { background:rgba(124,58,237,0.12); border-color:var(--accent2); color:var(--accent2); }
+
+/* Scrollable chart */
+.table-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.table-header { padding:1rem 1.25rem; border-bottom:1px solid var(--border); font-size:0.8rem; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:0.08em; }
+.table-
+
+/* Grid 3 */
+.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-bottom:1rem; }
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
+
+/* Tooltip */
+.info-tag { font-size:0.7rem; color:var(--text3); background:var(--surface2); border:1px solid var(--border); border-radius:4px; padding:2px 6px; font-family:'DM Mono',monospace; }
+
+@media(max-width:900px){
+  .charts-row,.charts-row.big,.charts-row.three,.g3,.g2,.geo-grid { grid-template-columns:1fr; }
+  .kpi-grid { grid-template-columns:1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      ASPORA <span>MEDIA INTEL</span>
+      <small>Benchmarking & Analytics Platform</small>
+    </div>
+    <div class="header-meta">
+      <div class="live-badge"><div class="live-dot"></div>Dec 2025 – Jan 2026</div>
+      <div class="filters">
+        <select id="countryFilter" onchange="navigateToMarket(this.value)">
+          <option value="all">🌍 All Markets</option>
+          <option value="us">🇺🇸 United States</option>
+          <option value="uae">🇦🇪 UAE / Dubai</option>
+          <option value="uk">🇬🇧 UK / London</option>
+        </select>
+        <select id="metricFilter" onchange="switchOverviewMetric(this.value)">
+          <option value="impressions">View: Impressions</option>
+          <option value="ctr">View: CTR</option>
+          <option value="completion">View: Completion Rate</option>
+          <option value="cost">View: Cost (AED/£/$)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-inner">
+    <button class="tab-btn active" onclick="showTab('overview')"><span class="tab-icon">⬡</span> Overview</button>
+    <button class="tab-btn" onclick="showTab('us')"><span class="tab-icon">🇺🇸</span> United States</button>
+    <button class="tab-btn" onclick="showTab('uae')"><span class="tab-icon">🇦🇪</span> UAE / Dubai</button>
+    <button class="tab-btn" onclick="showTab('uk')"><span class="tab-icon">🇬🇧</span> UK / London</button>
+    <button class="tab-btn" onclick="showTab('iconic')"><span class="tab-icon">★</span> Iconic Locations</button>
+    <button class="tab-btn" onclick="showTab('ooh')"><span class="tab-icon">⬡</span> OOH Rates</button>
+    <button class="tab-btn" onclick="showTab('benchmarks')"><span class="tab-icon">◈</span> Benchmarks</button>
+    <button class="tab-btn" onclick="showTab('geo')"><span class="tab-icon">⊕</span> Geography</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- OVERVIEW -->
+<div class="section active" id="overview">
+  <div class="section-hdr">
+    <div class="section-title">Cross-Market Overview<small>Aspora Campaign Intelligence — Dec 2025 to Jan 2026 · All Markets</small></div>
+    <span class="period-badge">Dec 8, 2025 → Jan 11, 2026</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-label">Total Impressions</div>
+      <div class="kpi-value blue">9.01M</div>
+      <div class="kpi-sub"><span class="kpi-delta up">↑ Across all channels</span></div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">US CTV Completion Rate</div>
+      <div class="kpi-value green">98.99%</div>
+      <div class="kpi-sub"><span class="kpi-delta up">↑ vs 92–97% benchmark</span></div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">US Total Video Completions</div>
+      <div class="kpi-value purple">2.37M</div>
+      <div class="kpi-sub">Sling + Prime combined</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">US Display CTR</div>
+      <div class="kpi-value amber">0.208%</div>
+      <div class="kpi-sub"><span class="kpi-delta up">↑ vs 0.12% benchmark</span></div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">US Prime Video CTR</div>
+      <div class="kpi-value blue">0.084%</div>
+      <div class="kpi-sub">1,160 total clicks</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">US Sling Channels</div>
+      <div class="kpi-value green">18</div>
+      <div class="kpi-sub">South Asian diaspora networks</div>
+    </div>
+  </div>
+
+  <div class="charts-row big">
+    <div class="chart-card">
+      <div class="chart-title">US Campaign — Impressions by Channel Type <span class="info-tag">Internal · Dec 2025 – Jan 2026</span></div>
+      <div class="chart-wrap"><canvas id="overviewChannelChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Completion Rate vs Benchmark</div>
+      <div class="chart-wrap"><canvas id="overviewCompChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="charts-row three">
+    <div class="chart-card">
+      <div class="chart-title">CTR by Channel Type</div>
+      <div class="chart-wrap"><canvas id="overviewCTRChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Sling TV Weekly Ad Volume</div>
+      <div class="chart-wrap"><canvas id="overviewWeeklyChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Prime Video — Device Split</div>
+      <div class="chart-wrap"><canvas id="overviewDeviceChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- US SECTION -->
+<div class="section" id="us">
+  <div class="section-hdr">
+    <div class="section-title">🇺🇸 United States — Internal Campaign Benchmarks<small>Actual Aspora US campaign results · Dec 2025 – Jan 2026 · For internal planning & benchmarking only</small></div>
+    <span class="period-badge">MediaMorphosis · Internal Data · Not for external use</span>
+  </div>
+
+  <!-- Internal benchmark notice -->
+  <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:flex-start;gap:12px;">
+    <div style="font-size:1.2rem;flex-shrink:0">📊</div>
+    <div>
+      <div style="font-size:0.82rem;font-weight:600;color:var(--accent4);margin-bottom:4px;">Internal Benchmark Data</div>
+      <div style="font-size:0.8rem;color:var(--text2);line-height:1.6;">These are Aspora's actual US campaign performance results (Dec 2025–Jan 2026) across Sling TV, Amazon Prime Video, Display, Sony SET HD, and TV9 Telugu. Use these as internal benchmarks when evaluating future US media buys — not as public-facing inventory listings.</div>
+    </div>
+  </div>
+
+  <!-- KPI Summary -->
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-label">CTV / Sling — Total Ads Served</div>
+      <div class="kpi-value blue">1.02M</div>
+      <div class="kpi-sub">18 South Asian channels · 5 weeks</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">US CTV Completion Rate</div>
+      <div class="kpi-value green">98.99%</div>
+      <div class="kpi-sub"><span class="kpi-delta up">↑ vs 92–97% industry benchmark</span></div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Prime Video Impressions</div>
+      <div class="kpi-value amber">1.38M</div>
+      <div class="kpi-sub">98.78% video completion rate</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Display CTR</div>
+      <div class="kpi-value purple">0.208%</div>
+      <div class="kpi-sub"><span class="kpi-delta up">↑ vs 0.12% programmatic avg</span></div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Display Impressions</div>
+      <div class="kpi-value blue">6.61M</div>
+      <div class="kpi-sub">Phone 79.2% · Desktop 14% · Tablet 6.8%</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Total Combined Reach</div>
+      <div class="kpi-value green">9.01M</div>
+      <div class="kpi-sub">Across all US channels</div>
+    </div>
+  </div>
+
+  <!-- Sub-section nav pills -->
+  <div class="inv-pills" style="margin-bottom:1.5rem;">
+    <div class="pill active" onclick="showUSSection('us-ctv',this)">📺 Sling TV / CTV</div>
+    <div class="pill" onclick="showUSSection('us-prime',this)">▶ Prime Video</div>
+    <div class="pill" onclick="showUSSection('us-display',this)">⬛ Display</div>
+    <div class="pill" onclick="showUSSection('us-linear',this)">📡 Linear TV (Sony)</div>
+    <div class="pill" onclick="showUSSection('us-social',this)">◎ Social (TV9)</div>
+  </div>
+
+  <!-- CTV Sub-section -->
+  <div id="us-ctv" class="us-subsection">
+    <div class="section-hdr" style="margin-bottom:1rem;">
+      <div class="section-title" style="font-size:1.1rem;">Sling TV / CTV — 18 South Asian Networks<small>DISH5431.1 · Advertiser ID 4645723235 · Dec 8, 2025 – Jan 11, 2026</small></div>
+      <span class="period-badge">5 weeks · Campaign benchmark</span>
+    </div>
+    <div class="charts-row big">
+      <div class="chart-card">
+        <div class="chart-title">Completion Rate by Channel <span class="info-tag">vs 97% benchmark</span></div>
+        <div class="chart-wrap" style="height:300px"><canvas id="ctvChannelChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Weekly Ad Volume Trend</div>
+        <div class="chart-wrap"><canvas id="ctvWeeklyTrend"></canvas></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="table-card">
+        <div class="table-header">Channel Performance — Internal Results</div>
+        <div class="table-body"><table class="data-table"><thead><tr><th>Channel</th><th>Category</th><th>Ads Served</th><th>Completed</th><th>Completion %</th></tr></thead><tbody id="ctvChannelTable"></tbody></table></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Ad Volume by Channel</div>
+        <div class="chart-wrap"><canvas id="ctvPieChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prime Video Sub-section -->
+  <div id="us-prime" class="us-subsection" style="display:none;">
+    <div class="section-hdr" style="margin-bottom:1rem;">
+      <div class="section-title" style="font-size:1.1rem;">Amazon Prime Video — Streaming Results<small>Aspora_PrimeStreaming_Dec2025 · Dec 10, 2025 – Jan 8, 2026</small></div>
+      <span class="period-badge">Campaign benchmark · Internal only</span>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card blue"><div class="kpi-label">Total Impressions</div><div class="kpi-value blue">1.38M</div><div class="kpi-sub">1,382,989 served</div></div>
+      <div class="kpi-card green"><div class="kpi-label">Video Completion Rate</div><div class="kpi-value green">98.78%</div><div class="kpi-sub"><span class="kpi-delta up">↑ vs 90–95% OTT benchmark</span></div></div>
+      <div class="kpi-card amber"><div class="kpi-label">CTR</div><div class="kpi-value amber">0.084%</div><div class="kpi-sub">30s creative: 0.108% · 15s: 0.062%</div></div>
+      <div class="kpi-card purple"><div class="kpi-label">Video Completions</div><div class="kpi-value purple">1.37M</div><div class="kpi-sub">1,365,873 completed</div></div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-title">Creative Performance (15s vs 30s)</div>
+        <div class="chart-wrap"><canvas id="primeCreativeChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Top States by Impressions</div>
+        <div class="chart-wrap"><canvas id="primeGeoChart"></canvas></div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="chart-card"><div class="chart-title">Audience Segment Breakdown</div><div class="chart-wrap"><canvas id="primeAudienceChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Video Completion Rate by State</div><div class="chart-wrap"><canvas id="primeVCRChart"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- Display Sub-section -->
+  <div id="us-display" class="us-subsection" style="display:none;">
+    <div class="section-hdr" style="margin-bottom:1rem;">
+      <div class="section-title" style="font-size:1.1rem;">Display Ad Network — Campaign Results<small>Aspora_DisplayCampaign_Dec2025 · Dec 12, 2025 – Jan 8, 2026</small></div>
+      <span class="period-badge">Campaign benchmark · Internal only</span>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card blue"><div class="kpi-label">Total Impressions</div><div class="kpi-value blue">6.61M</div><div class="kpi-sub">6,610,069 served</div></div>
+      <div class="kpi-card amber"><div class="kpi-label">Overall CTR</div><div class="kpi-value amber">0.208%</div><div class="kpi-sub"><span class="kpi-delta up">↑ vs 0.12% programmatic avg</span></div></div>
+      <div class="kpi-card green"><div class="kpi-label">Total Clicks</div><div class="kpi-value green">13,746</div></div>
+      <div class="kpi-card purple"><div class="kpi-label">Mobile CTR</div><div class="kpi-value purple">0.245%</div><div class="kpi-sub">vs 0.053% desktop</div></div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card"><div class="chart-title">Impressions by Device</div><div class="chart-wrap"><canvas id="displayDeviceChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">CTR by Device <span class="info-tag">vs 0.12% benchmark</span></div><div class="chart-wrap"><canvas id="displayCTRDeviceChart"></canvas></div></div>
+    </div>
+    <div class="g2">
+      <div class="chart-card"><div class="chart-title">Top 10 States by Impressions</div><div class="chart-wrap"><canvas id="displayGeoChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">State-Level CTR</div><div class="chart-wrap"><canvas id="displayStateCTRChart"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- Linear TV Sub-section -->
+  <div id="us-linear" class="us-subsection" style="display:none;">
+    <div class="section-hdr" style="margin-bottom:1rem;">
+      <div class="section-title" style="font-size:1.1rem;">Sony SET HD USA — Linear TV Placements<small>MediaMorphosis · Dec 21, 2025 – Jan 2026</small></div>
+      <span class="period-badge">Campaign benchmark · Internal only</span>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card blue"><div class="kpi-label">Network</div><div class="kpi-value blue" style="font-size:1.4rem">SET HD USA</div><div class="kpi-sub">Sony Entertainment Television</div></div>
+      <div class="kpi-card green"><div class="kpi-label">Placement Status</div><div class="kpi-value green" style="font-size:1.4rem">100%</div><div class="kpi-sub">All spots placed</div></div>
+      <div class="kpi-card amber"><div class="kpi-label">Spot Length</div><div class="kpi-value amber">15 sec</div></div>
+      <div class="kpi-card purple"><div class="kpi-label">Shows</div><div class="kpi-value purple" style="font-size:1.1rem">Indian Idol<br>India's Got Talent</div></div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card"><div class="chart-title">Placements by Show</div><div class="chart-wrap"><canvas id="linearShowChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Daypart Distribution</div><div class="chart-wrap"><canvas id="linearDaypartChart"></canvas></div></div>
+    </div>
+    <div class="table-card">
+      <div class="table-header">Placement Log — Sony SET HD USA</div>
+      <div class="table-body"><table class="data-table"><thead><tr><th>Channel</th><th>Date</th><th>Log Time</th><th>Length</th><th>Show / Inventory Block</th><th>Status</th></tr></thead><tbody>
+        <tr><td>SET HD USA</td><td>Dec 21</td><td class="mono">+00:46:30</td><td>15s</td><td>Indian Idol – PR – 30 Min</td><td><span class="badge green">✓ Placed</span></td></tr>
+        <tr><td>SET HD USA</td><td>Dec 21</td><td class="mono">22:01:17</td><td>15s</td><td>India's Got Talent – Org – 30 Min</td><td><span class="badge green">✓ Placed</span></td></tr>
+        <tr><td>SET HD USA</td><td>Dec 22</td><td class="mono">21:55:00</td><td>15s</td><td>India's Got Talent – PR</td><td><span class="badge green">✓ Placed</span></td></tr>
+        <tr><td>SET HD USA</td><td>Dec 28</td><td class="mono">22:15:00</td><td>15s</td><td>Indian Idol – ORG – 30 Min</td><td><span class="badge green">✓ Placed</span></td></tr>
+        <tr><td>SET HD USA</td><td>Jan 4</td><td class="mono">22:01:00</td><td>15s</td><td>India's Got Talent – ORG</td><td><span class="badge green">✓ Placed</span></td></tr>
+      </tbody></table></div>
+    </div>
+  </div>
+
+  <!-- Social Sub-section -->
+  <div id="us-social" class="us-subsection" style="display:none;">
+    <div class="section-hdr" style="margin-bottom:1rem;">
+      <div class="section-title" style="font-size:1.1rem;">TV9 Telugu USA — Social / YouTube Results<small>Dec 2025 · YouTube, Facebook, Instagram</small></div>
+      <span class="period-badge">Campaign benchmark · Internal only</span>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card blue"><div class="kpi-label">Channel</div><div class="kpi-value blue" style="font-size:1.3rem">TV9 Telugu</div><div class="kpi-sub">South Indian diaspora</div></div>
+      <div class="kpi-card amber"><div class="kpi-label">Top Video Views</div><div class="kpi-value amber">31K</div><div class="kpi-sub">4-min headlines · Dec 21</div></div>
+      <div class="kpi-card green"><div class="kpi-label">Format</div><div class="kpi-value green" style="font-size:1.3rem">YouTube</div><div class="kpi-sub">+ Facebook, Instagram</div></div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card"><div class="chart-title">YouTube Views by Date (TV9 Telugu)</div><div class="chart-wrap"><canvas id="tv9ViewsChart"></canvas></div></div>
+      <div class="chart-card"><div class="chart-title">Social Platform CTR Benchmarks (Reference)</div><div class="chart-wrap"><canvas id="socialBenchChart"></canvas></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- AI SEARCH BAR - fixed floating -->
+<div id="searchBar" style="position:fixed;bottom:24px;right:24px;z-index:200;width:420px;">
+  <div style="background:var(--surface2);border:1px solid var(--accent);border-radius:16px;box-shadow:0 8px 40px rgba(0,212,255,0.25);overflow:hidden;">
+    <div style="padding:0.75rem 1rem;background:linear-gradient(135deg,rgba(0,212,255,0.1),rgba(124,58,237,0.08));border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:0.78rem;font-weight:700;color:var(--accent);letter-spacing:0.08em;display:flex;align-items:center;gap:6px;">
+        <span>🔍</span> MEDIA RATE SEARCH <span style="font-size:0.62rem;color:var(--text3);font-weight:400">AI-POWERED</span>
+      </div>
+      <div id="searchToggle" onclick="toggleSearch()" style="cursor:pointer;font-size:0.72rem;color:var(--text3);padding:2px 8px;border:1px solid var(--border);border-radius:4px;">▲ hide</div>
+    </div>
+    <div id="searchBody">
+      <div style="padding:0.75rem 1rem;">
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <input id="searchInput" type="text" placeholder='Try: "Canary Wharf tube rates" or "Burj Khalifa 30 seconds cost"'
+            style="flex:1;background:var(--surface3);border:1px solid var(--border);border-radius:8px;padding:0.6rem 0.75rem;color:var(--text);font-size:0.8rem;font-family:inherit;outline:none;"
+            onkeydown="if(event.key==='Enter') runSearch()"
+          />
+          <button onclick="runSearch()" style="background:var(--accent);color:#000;border:none;border-radius:8px;padding:0.6rem 1rem;font-size:0.8rem;font-weight:700;cursor:pointer;white-space:nowrap;">Ask</button>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="search-pill" onclick="quickSearch(this)">Times Square 30s</span>
+          <span class="search-pill" onclick="quickSearch(this)">Burj Khalifa cost</span>
+          <span class="search-pill" onclick="quickSearch(this)">Canary Wharf tube</span>
+          <span class="search-pill" onclick="quickSearch(this)">Dubai Metro rates</span>
+          <span class="search-pill" onclick="quickSearch(this)">London bus shelter</span>
+        </div>
+      </div>
+      <div id="searchResult" style="padding:0 1rem 1rem;display:none;">
+        <div style="border-top:1px solid var(--border);padding-top:0.75rem;">
+          <div id="searchAnswer" style="font-size:0.82rem;color:var(--text2);line-height:1.65;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.search-pill{background:var(--surface3);border:1px solid var(--border);color:var(--text3);font-size:0.7rem;padding:3px 10px;border-radius:12px;cursor:pointer;transition:all 0.15s;}
+.search-pill:hover{border-color:var(--accent);color:var(--accent);}
+#searchInput:focus{border-color:var(--accent);}
+.answer-table{width:100%;border-collapse:collapse;margin:8px 0;font-size:0.78rem;}
+.answer-table th{text-align:left;padding:4px 8px;color:var(--text3);border-bottom:1px solid var(--border);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;}
+.answer-table td{padding:4px 8px;border-bottom:1px solid rgba(42,50,69,0.4);color:var(--text2);}
+.answer-highlight{color:var(--accent);font-weight:600;}
+.search-spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.6s linear infinite;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+
+<!-- ICONIC LOCATIONS -->
+<div class="section" id="iconic">
+  <div class="section-hdr">
+    <div class="section-title">★ Iconic Locations — Global Rate Card<small>Web-sourced market rates · Times Square · Burj Khalifa · Canary Wharf · Dubai Frame · London Tube Premium · 2025–2026</small></div>
+    <span class="period-badge">Source: Arabian Business, AdQuick, Media.co.uk, TfL Media 2025–2026</span>
+  </div>
+
+  <div style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:flex-start;gap:12px;">
+    <div style="font-size:1.2rem;flex-shrink:0">🌐</div>
+    <div style="font-size:0.8rem;color:var(--text2);line-height:1.6;">These rates are sourced from public media reports, agency rate cards, and industry publications (Arabian Business, AdQuick, Media.co.uk, TfL). They represent typical/published rates and may vary by season, exclusivity, and agency. Use the <strong style="color:var(--accent)">AI Search</strong> (bottom-right) to ask detailed questions about any location.</div>
+  </div>
+
+  <!-- TIMES SQUARE -->
+  <div class="table-card" style="margin-bottom:1rem;">
+    <div class="table-header" style="background:linear-gradient(90deg,rgba(239,68,68,0.1),transparent);">🗽 Times Square, New York — Billboard Rates (2025–2026)</div>
+    <div class="table-body">
+      <table class="data-table">
+        <thead><tr><th>Format / Location</th><th>Duration</th><th>Ad Length</th><th>Impressions</th><th>Rate (USD)</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Standard Digital (shared loop)</td><td>Per day</td><td>30 sec</td><td>~500K/day</td><td><span class="badge amber">$1,000–$5,000/day</span></td><td>Shared with other brands, 10–15 rotations/hr</td></tr>
+          <tr><td>Standard Digital (shared loop)</td><td>Per day</td><td>15 sec</td><td>~500K/day</td><td><span class="badge blue">$300–$1,000/day</span></td><td>88 plays/day in some packages</td></tr>
+          <tr><td>Premium — Broadway Bowtie (46th & 7th)</td><td>4 weeks</td><td>15s loop</td><td>Millions</td><td><span class="badge red">$20,000–$50,000/wk</span></td><td>Highest foot traffic intersection</td></tr>
+          <tr><td>Full-Day Exclusive Takeover</td><td>1 day</td><td>All day</td><td>~475K/day</td><td><span class="badge red">$10,000–$50,000</span></td><td>No competing ads, continuous rotation</td></tr>
+          <tr><td>Vertical LED Billboard (55' × 31')</td><td>4 weeks</td><td>8 sec spot</td><td>Broadway Plaza views</td><td><span class="badge amber">~$27,000/4wks</span></td><td>Source: Alluvit Media</td></tr>
+          <tr><td>Static Backlit Bulletin (26' × 24')</td><td>4 weeks</td><td>Always on</td><td>Illuminated 24/7</td><td><span class="badge blue">~$11,000/4wks</span></td><td>Upward spotlights</td></tr>
+          <tr><td>Static Bulletin (Marriott Marquis)</td><td>4 weeks</td><td>Always on</td><td>Premium</td><td><span class="badge red">$300,000/4wks</span></td><td>Most prestigious static site</td></tr>
+          <tr><td>Prime Digital (non-Marquis screen)</td><td>4 weeks</td><td>15s loop</td><td>High</td><td><span class="badge amber">$50,000/4wks</span></td><td>Standard non-prime screen</td></tr>
+          <tr><td><strong>Full Building Takeover (One Times Sq.)</strong></td><td>Annual</td><td>Always on</td><td>Landmark</td><td><span class="badge red">$1.1M–$4M / year</span></td><td>Nasdaq Tower, One Times Square iconic screens</td></tr>
+          <tr><td>Personal/Promo (small screen)</td><td>1 day</td><td>15s/hr × 24h</td><td>Street-level</td><td><span class="badge green">$150–$500/day</span></td><td>Entry-level digital screen packages</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BURJ KHALIFA -->
+  <div class="table-card" style="margin-bottom:1rem;">
+    <div class="table-header" style="background:linear-gradient(90deg,rgba(0,212,255,0.1),transparent);">🏙️ Burj Khalifa, Dubai — LED Façade Rates</div>
+    <div class="table-body">
+      <table class="data-table">
+        <thead><tr><th>Package</th><th>Duration</th><th>Time Slot</th><th>Day Type</th><th>Rate (AED)</th><th>Rate (USD approx.)</th></tr></thead>
+        <tbody>
+          <tr><td>Single 3-min display</td><td>3 minutes</td><td>8 PM–10 PM</td><td>Weekday</td><td><span class="badge blue">AED 250,000–350,000</span></td><td>~$68K–$95K</td></tr>
+          <tr><td>Single 3-min display</td><td>3 minutes</td><td>8 PM–10 PM</td><td>Weekend</td><td><span class="badge amber">AED 350,000–450,000</span></td><td>~$95K–$122K</td></tr>
+          <tr><td>Double 3-min impressions</td><td>3+3 minutes</td><td>8 PM–10 PM</td><td>Any night</td><td><span class="badge amber">AED 500,000–580,000</span></td><td>~$136K–$158K</td></tr>
+          <tr><td>5× 3-min displays</td><td>5 × 3 min</td><td>7 PM–midnight</td><td>Any night</td><td><span class="badge red">AED 1,000,000</span></td><td>~$272K</td></tr>
+          <tr><td>Premium peak period (New Year's, National Day)</td><td>3 minutes</td><td>Countdown/event</td><td>Special</td><td><span class="badge red">AED 1,300,000+</span></td><td>~$354K+</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="padding:0.75rem 1.25rem;background:rgba(0,212,255,0.04);font-size:0.77rem;color:var(--text3);line-height:1.6;">
+      📋 <strong style="color:var(--text2)">Booking notes:</strong> Managed by Mullen Lowe MENA. Content must be submitted to Emaar Properties 4 weeks in advance. No syncing with Dubai Fountain shows. Full payment in advance. Personal milestone displays (birthdays etc.) not permitted. No political or offensive content. Clients include Disney, Huawei, TikTok, Samsung, Microsoft, Noon, Cartier.
+    </div>
+  </div>
+
+  <!-- CANARY WHARF TUBE -->
+  <div class="table-card" style="margin-bottom:1rem;">
+    <div class="table-header" style="background:linear-gradient(90deg,rgba(16,185,129,0.1),transparent);">🚇 Canary Wharf Tube Station, London — Advertising Formats</div>
+    <div class="table-body">
+      <table class="data-table">
+        <thead><tr><th>Format</th><th>Location in Station</th><th>Annual Footfall</th><th>Campaign Length</th><th>Approx. Rate (£)</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Platform 16 Sheet</td><td>Platform (cross-track)</td><td rowspan="6" style="vertical-align:middle;"><strong style="color:var(--accent3)">47M+</strong><br><span style="font-size:0.7rem;color:var(--text3)">passengers/yr<br>Jubilee line hub<br>90K workers daily</span></td><td>2 weeks</td><td><span class="badge green">£406/site</span></td><td>Proposed rate (market: £625). ABC1 professionals</td></tr>
+          <tr><td>48 Sheet Cross-Track</td><td>Platform</td><td>2 weeks</td><td><span class="badge amber">£1,125–£2,400/site</span></td><td>Zone 2 premium. Market rate: £1,730+</td></tr>
+          <tr><td>LEP (Escalator Panel)</td><td>Escalators / stairs</td><td>2 weeks</td><td><span class="badge green">£57–£88/site</span></td><td>High frequency · 170+ sites available network-wide</td></tr>
+          <tr><td>6 Sheet (Platform)</td><td>Platform walls</td><td>2 weeks</td><td><span class="badge green">£361–£400/site</span></td><td>Good for high-frequency messaging</td></tr>
+          <tr><td>Digital Screen</td><td>Concourse / ticket hall</td><td>2 weeks</td><td><span class="badge amber">£553–£750/site</span></td><td>12-sec spot, 15% SOV loop</td></tr>
+          <tr><td>Station Domination / Takeover</td><td>Whole station</td><td>2 weeks</td><td><span class="badge red">£50,000–£150,000+</span></td><td>All formats across entire station</td></tr>
+          <tr><td colspan="6" style="background:rgba(16,185,129,0.04);font-size:0.77rem;color:var(--text3);padding:0.6rem 1rem;">
+            📍 <strong style="color:var(--text2)">Outside Canary Wharf (nearby):</strong> Canary Wharf Shopping Mall screens (indoor retail DOOH), DLR Canary Wharf DLR station (separate from Tube), West India Quay, Heron Quays. 
+            Canary Wharf Group also manage outdoor street-level sites within the estate (Canada Square, Crossrail Place). Premium due to ABC1/finance audience — Barclays, HSBC, Citigroup all headquartered here.
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- LONDON TUBE PREMIUM STATIONS -->
+  <div class="table-card" style="margin-bottom:1rem;">
+    <div class="table-header" style="background:linear-gradient(90deg,rgba(124,58,237,0.1),transparent);">🚇 London Tube — Format Pricing by Station Tier (2025)</div>
+    <div class="table-body">
+      <table class="data-table">
+        <thead><tr><th>Format</th><th>Station Tier</th><th>Example Stations</th><th>Daily Footfall</th><th>Rate per site / 2 weeks (£)</th></tr></thead>
+        <tbody>
+          <tr><td>48 Sheet Cross-Track</td><td>Cat 1 (Premium)</td><td>Oxford Circus, King's Cross, Waterloo, Liverpool St</td><td>100K+</td><td><span class="badge red">£2,200–£3,500</span></td></tr>
+          <tr><td>48 Sheet Cross-Track</td><td>Cat 2–3</td><td>Victoria, Bond Street, Bank, Piccadilly Circus</td><td>50K–100K</td><td><span class="badge amber">£1,400–£2,400</span></td></tr>
+          <tr><td>48 Sheet Cross-Track</td><td>Cat 3–4</td><td>Camden, Clapham, Angel, Canary Wharf</td><td>20K–50K</td><td><span class="badge blue">£950–£1,600</span></td></tr>
+          <tr><td>48 Sheet Cross-Track</td><td>Zone 3–6</td><td>Outer London stations</td><td>&lt;20K</td><td><span class="badge green">£750–£1,000</span></td></tr>
+          <tr><td>16 Sheet</td><td>Any</td><td>All stations</td><td>—</td><td><span class="badge green">£400–£625/site</span></td></tr>
+          <tr><td>6 Sheet</td><td>Any</td><td>All stations</td><td>—</td><td><span class="badge green">£361–£400/site</span></td></tr>
+          <tr><td>LEP (Escalator Panels)</td><td>Network-wide</td><td>800+ stations</td><td>—</td><td><span class="badge green">£57–£88/site</span></td></tr>
+          <tr><td>Tube Car Panels</td><td>All trains</td><td>Inside carriage</td><td>13-min avg journey</td><td><span class="badge green">From £10/panel</span></td></tr>
+          <tr><td>96 Sheet (Largest format)</td><td>Cat 1–2</td><td>Major stations</td><td>—</td><td><span class="badge red">£3,500+/site</span></td></tr>
+          <tr><td>Full Station Takeover</td><td>Any</td><td>Target station</td><td>—</td><td><span class="badge red">£50K–£500K+</span></td></tr>
+          <tr><td>London-wide LEP Network</td><td>Network</td><td>800+ escalator panels</td><td>4M+ daily</td><td><span class="badge red">£32,000 media / 2wk</span></td></tr>
+          <tr><td>Tube Car Panels — Full Network</td><td>Network</td><td>2,200+ panels</td><td>2.5M+ daily</td><td><span class="badge amber">£22,000 / 2wk</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DUBAI ICONIC + MORE -->
+  <div class="g2" style="margin-bottom:0;">
+    <div class="table-card">
+      <div class="table-header" style="background:linear-gradient(90deg,rgba(245,158,11,0.1),transparent);">🏙️ Dubai — Premium Inventory Rates (Market)</div>
+      <div class="table-body">
+        <table class="data-table">
+          <thead><tr><th>Location / Format</th><th>Rate</th><th>Duration</th></tr></thead>
+          <tbody>
+            <tr><td>Burj Khalifa LED (Weekday 3min)</td><td><span class="badge amber">AED 250K–350K</span></td><td>3 min, 8–10pm</td></tr>
+            <tr><td>Burj Khalifa LED (Weekend 3min)</td><td><span class="badge red">AED 350K–450K</span></td><td>3 min, 8–10pm</td></tr>
+            <tr><td>Sheikh Zayed Road Static Billboard</td><td><span class="badge amber">AED 60K–120K</span></td><td>4 weeks</td></tr>
+            <tr><td>Sheikh Zayed Road Digital Screen</td><td><span class="badge amber">AED 80K–400K</span></td><td>4 weeks</td></tr>
+            <tr><td>SZR Bridge Network (4 LED bridges)</td><td><span class="badge amber">AED 580K</span></td><td>1 month · 1.5M/day</td></tr>
+            <tr><td>Dubai Mall Atrium LED Wall</td><td><span class="badge red">AED 85K–145K/wk</span></td><td>Per week</td></tr>
+            <tr><td>Dubai Mall Fashion District Screen</td><td><span class="badge amber">AED 28K–42K/wk</span></td><td>Per week</td></tr>
+            <tr><td>Dubai Hills Mall Atrium LED</td><td><span class="badge amber">AED 85K–145K/wk</span></td><td>Per week</td></tr>
+            <tr><td>DXB Airport Terminal (Premium)</td><td><span class="badge red">AED 40K–150K/mo</span></td><td>Per month</td></tr>
+            <tr><td>Ain Dubai (Giant Ferris Wheel)</td><td><span class="badge amber">Contact for rates</span></td><td>Bluewaters Island</td></tr>
+            <tr><td>Dubai Frame (via DM)</td><td><span class="badge blue">AED 30K–80K est.</span></td><td>Via Dubai Municipality</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-header" style="background:linear-gradient(90deg,rgba(239,68,68,0.1),transparent);">🗽 US Premium Inventory — Market Rates</div>
+      <div class="table-body">
+        <table class="data-table">
+          <thead><tr><th>Location / Format</th><th>Rate</th><th>Duration</th></tr></thead>
+          <tbody>
+            <tr><td>Times Square — Standard Digital (30s)</td><td><span class="badge amber">$1K–$5K/day</span></td><td>Shared loop</td></tr>
+            <tr><td>Times Square — Premium Bowtie</td><td><span class="badge red">$20K–$50K/wk</span></td><td>Central location</td></tr>
+            <tr><td>Times Square — Full Building (annual)</td><td><span class="badge red">$1.1M–$4M/yr</span></td><td>One Times Square</td></tr>
+            <tr><td>NYC Manhattan Digital Billboard</td><td><span class="badge amber">$15K–$50K/mo</span></td><td>Per month</td></tr>
+            <tr><td>NYC Static Billboard (Outer boroughs)</td><td><span class="badge green">$3K–$8K/mo</span></td><td>Per month</td></tr>
+            <tr><td>US National TV — Prime Time (30s)</td><td><span class="badge red">$100K+/spot</span></td><td>Per spot</td></tr>
+            <tr><td>Sling TV / CTV (30s, Indian channels)</td><td><span class="badge blue">Internal data only</span></td><td>See US tab</td></tr>
+            <tr><td>Amazon Prime Video (30s)</td><td><span class="badge blue">Internal data only</span></td><td>See US tab</td></tr>
+            <tr><td>Display Programmatic CPM (avg)</td><td><span class="badge green">$0.50–$12 CPM</span></td><td>Programmatic</td></tr>
+            <tr><td>Super Bowl 30s spot</td><td><span class="badge red">$7M+/30s</span></td><td>2025 rate</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- OOH -->
+<div class="section" id="ooh">
+  <div class="section-hdr">
+    <div class="section-title">OOH / DOOH — Industry Benchmarks<small>Out-of-Home · Digital Out-of-Home · Reference Rates</small></div>
+    <span class="period-badge">2025–2026 Market Benchmarks</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-label">OOH CPM (Billboard)</div>
+      <div class="kpi-value blue">$3–$8</div>
+      <div class="kpi-sub">Traditional highway billboard</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">DOOH CPM</div>
+      <div class="kpi-value green">$5–$25</div>
+      <div class="kpi-sub">Digital out-of-home screens</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Subway/Transit CPM</div>
+      <div class="kpi-value amber">$8–$30</div>
+      <div class="kpi-sub">NYC/Chicago subway ads</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Airport DOOH CPM</div>
+      <div class="kpi-value purple">$20–$75</div>
+      <div class="kpi-sub">Premium international terminals</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Times Square CPM</div>
+      <div class="kpi-value blue">$40–$80</div>
+      <div class="kpi-sub">Premium NYC billboard</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Mall/Retail DOOH CPM</div>
+      <div class="kpi-value green">$10–$40</div>
+      <div class="kpi-sub">Indoor retail screens</div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">OOH CPM Range by Inventory Type</div>
+      <div class="chart-wrap"><canvas id="oohCPMChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">OOH Attention & Recall Benchmarks</div>
+      <div class="chart-wrap"><canvas id="oohRecallChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="benchmark-row">
+    <div class="bench-card">
+      <div class="bench-title">📍 Traditional OOH</div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#00d4ff"></div>Highway Billboard</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent)">$3–8 CPM</span><span class="bench-industry">4–6 week cycles</span></div>
+      </div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#10b981"></div>Subway/Transit</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent3)">$8–30 CPM</span><span class="bench-industry">NYC avg ~$18</span></div>
+      </div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#7c3aed"></div>Bus Shelter</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent2)">$5–20 CPM</span><span class="bench-industry">High dwell time</span></div>
+      </div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#f59e0b"></div>Wallscapes</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent4)">$10–25 CPM</span><span class="bench-industry">Urban premium</span></div>
+      </div>
+    </div>
+    <div class="bench-card">
+      <div class="bench-title">📺 Digital OOH (DOOH)</div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#00d4ff"></div>Times Square / Premium</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent)">$40–80 CPM</span><span class="bench-industry">Iconic placement</span></div>
+      </div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#10b981"></div>Airport (Int'l Terminal)</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent3)">$20–75 CPM</span><span class="bench-industry">Affluent audience</span></div>
+      </div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#7c3aed"></div>Mall / Retail Screens</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent2)">$10–40 CPM</span><span class="bench-industry">Purchase intent</span></div>
+      </div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#f59e0b"></div>Gas Station / POS</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent4)">$3–15 CPM</span><span class="bench-industry">Captive audience</span></div>
+      </div>
+    </div>
+    <div class="bench-card">
+      <div class="bench-title">📰 Print / Newspaper</div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#00d4ff"></div>National Daily (Full Page)</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent)">$50–200K</span><span class="bench-industry">Per insertion</span></div>
+      </div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#10b981"></div>Regional Paper</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent3)">$5–50K</span><span class="bench-industry">Per insertion</span></div>
+      </div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#7c3aed"></div>Ethnic / Diaspora Press</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent2)">$1–10K</span><span class="bench-industry">High affinity</span></div>
+      </div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#f59e0b"></div>Magazine (Full Page)</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent4)">$10–150K</span><span class="bench-industry">Glossy premium</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BENCHMARKS -->
+<div class="section" id="benchmarks">
+  <div class="section-hdr">
+    <div class="section-title">Industry Benchmarks — All Channels<small>2025–2026 Market Standards vs Aspora Performance</small></div>
+    <span class="period-badge">Source: Focus Digital, Marketing LTB, WordStream, Quimby 2025</span>
+  </div>
+
+  <div class="charts-row big">
+    <div class="chart-card">
+      <div class="chart-title">Aspora vs Industry — Key Metrics <span class="info-tag">Indexed to benchmark = 100</span></div>
+      <div class="chart-wrap" style="height:320px"><canvas id="benchRadarChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">CTR Benchmark by Channel Type</div>
+      <div class="chart-wrap"><canvas id="benchCTRChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="benchmark-row">
+    <div class="bench-card">
+      <div class="bench-title">🎬 Video / Streaming</div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#00d4ff"></div>CTV Completion Rate</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent)">98.99%</span><span class="bench-industry">Benchmark: 92–97%</span></div>
+      </div>
+      <div class="bench-bar-wrap"><div class="bench-bar" style="width:98.99%;background:var(--accent)"></div></div>
+      <div style="margin-top:8px">
+        <div class="bench-item">
+          <div class="bench-label"><div class="bench-dot" style="background:#10b981"></div>OTT/Prime VCR</div>
+          <div class="bench-values"><span class="bench-num" style="color:var(--accent3)">98.78%</span><span class="bench-industry">Benchmark: 90–95%</span></div>
+        </div>
+        <div class="bench-bar-wrap"><div class="bench-bar" style="width:98.78%;background:var(--accent3)"></div></div>
+      </div>
+    </div>
+    <div class="bench-card">
+      <div class="bench-title">⬛ Display / Programmatic</div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#f59e0b"></div>Aspora Display CTR</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent4)">0.208%</span><span class="bench-industry">Industry avg: 0.12%</span></div>
+      </div>
+      <div class="bench-bar-wrap"><div class="bench-bar" style="width:45%;background:var(--accent4)"></div></div>
+      <div style="margin-top:8px">
+        <div class="bench-item">
+          <div class="bench-label"><div class="bench-dot" style="background:#7c3aed"></div>Mobile Display CTR</div>
+          <div class="bench-values"><span class="bench-num" style="color:var(--accent2)">0.245%</span><span class="bench-industry">Mobile avg: 0.38%</span></div>
+        </div>
+        <div class="bench-bar-wrap"><div class="bench-bar" style="width:64%;background:var(--accent2)"></div></div>
+      </div>
+    </div>
+    <div class="bench-card">
+      <div class="bench-title">📱 Social / Search</div>
+      <div class="bench-item">
+        <div class="bench-label"><div class="bench-dot" style="background:#10b981"></div>Search Ads (Google)</div>
+        <div class="bench-values"><span class="bench-num" style="color:var(--accent3)">6.66%</span><span class="bench-industry">Industry avg 2025</span></div>
+      </div>
+      <div class="bench-bar-wrap"><div class="bench-bar" style="width:80%;background:var(--accent3)"></div></div>
+      <div style="margin-top:8px">
+        <div class="bench-item">
+          <div class="bench-label"><div class="bench-dot" style="background:#00d4ff"></div>Facebook / Meta CTR</div>
+          <div class="bench-values"><span class="bench-num" style="color:var(--accent)">2–5%</span><span class="bench-industry">Platform benchmark</span></div>
+        </div>
+        <div class="bench-bar-wrap"><div class="bench-bar" style="width:50%;background:var(--accent)"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-card full">
+    <div class="chart-title">Full Channel Benchmark Matrix — CPM, CTR, Completion Rate</div>
+    <div class="chart-wrap" style="height:320px"><canvas id="benchMatrixChart"></canvas></div>
+  </div>
+</div>
+
+<!-- UAE -->
+<div class="section" id="uae">
+  <div class="section-hdr">
+    <div class="section-title">🇦🇪 UAE / Dubai — Actual Vendor Rates<small>Real Aspora proposals from EDS, Yellow Media, Clear Vision, Multiple Frames, Phase Two · 2025</small></div>
+    <span class="period-badge">Source: Actual vendor invoices & proposals</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-label">Dubai Metro Full Domination (4 wks)</div>
+      <div class="kpi-value blue">AED 1.65M</div>
+      <div class="kpi-sub">656 panels, 8 stations, incl. VAT</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Radio 3-Month Invoice (City + HIT)</div>
+      <div class="kpi-value amber">AED 108K</div>
+      <div class="kpi-sub">70 spots/month each · 30 seconds</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Bus Wrap Cost Per Bus/Month</div>
+      <div class="kpi-value green">AED 16K</div>
+      <div class="kpi-sub">10-bus campaign = AED 362,000</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Taxi Rate (200 taxis, 4 wks)</div>
+      <div class="kpi-value purple">AED 160K</div>
+      <div class="kpi-sub">AED 800/taxi incl. RTA/DM approval</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">SZR Bridge Network (4 LEDs, 4 wks)</div>
+      <div class="kpi-value blue">AED 580K</div>
+      <div class="kpi-sub">1.5M daily impressions</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Total Asia Cup OOH Campaign</div>
+      <div class="kpi-value green">AED 2.49M</div>
+      <div class="kpi-sub">Full market domination budget</div>
+    </div>
+  </div>
+
+  <div class="charts-row big">
+    <div class="chart-card">
+      <div class="chart-title">UAE OOH Inventory — Actual Aspora Rates (AED) <span class="info-tag">4-week campaign · per vendor proposals</span></div>
+      <div class="chart-wrap" style="height:340px"><canvas id="uaeActualOOHChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Dubai Metro — Station-Level Breakdown (AED)</div>
+      <div class="chart-wrap"><canvas id="uaeMetroChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="charts-row three">
+    <div class="chart-card">
+      <div class="chart-title">Radio Rates — UAE South Asian Stations</div>
+      <div class="chart-wrap"><canvas id="uaeRadioChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Impressions per Inventory Type (M/month)</div>
+      <div class="chart-wrap"><canvas id="uaeImpressionsChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Asia Cup Campaign Budget Allocation</div>
+      <div class="chart-wrap"><canvas id="uaeCupBudgetChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header">🏷️ UAE Complete Vendor Rate Card — Actual Aspora Proposals 2025</div>
+    <div class="table-body">
+      <table class="data-table">
+        <thead><tr><th>Vendor</th><th>Inventory Type</th><th>Location / Detail</th><th>Qty/Faces</th><th>Duration</th><th>Impressions</th><th>Rate (AED)</th><th>Priority</th></tr></thead>
+        <tbody>
+          <tr style="background:rgba(0,212,255,0.05)"><td colspan="8" style="color:var(--accent);font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">📺 Dubai Metro (Multiple Frames / Phase Two)</td></tr>
+          <tr><td>Multiple Frames</td><td>Metro — In-Station Screen Walls</td><td>8 stations, 656 panels</td><td>656 panels</td><td>4 weeks</td><td class="mono">—</td><td><span class="badge green">AED 657,000</span></td><td><span class="badge amber">Must-Do</span></td></tr>
+          <tr><td>Multiple Frames</td><td>Metro — Elevator Wraps</td><td>8 stations, concourse</td><td>8 stations</td><td>4 weeks</td><td class="mono">—</td><td><span class="badge blue">AED 350,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>Multiple Frames</td><td>Metro — Ticket Gates</td><td>8 stations, concourse</td><td>8 stations</td><td>4 weeks</td><td class="mono">—</td><td><span class="badge blue">AED 325,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>Multiple Frames</td><td>Metro — In-Train Overhead Panels</td><td>125 trains, 250 panels</td><td>250 panels</td><td>4 weeks</td><td class="mono">800K/day</td><td><span class="badge blue">AED 240,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>Yellow Media</td><td>Metro — 70 Illuminated Faces</td><td>All 53 stations, backlit</td><td>70 faces</td><td>1 month</td><td class="mono">800K/day</td><td><span class="badge blue">AED 201,500</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr style="background:rgba(16,185,129,0.05)"><td colspan="8" style="color:var(--accent3);font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">🚌 Bus & Taxi (EDS / Yellow Media)</td></tr>
+          <tr><td>EDS</td><td>Bus Wrap (Full Wrap)</td><td>10 buses — Karama, Burjman, Silicon Oasis, Deira, Qusais</td><td>10 buses</td><td>4 weeks</td><td class="mono">500K-650K/bus</td><td><span class="badge green">AED 362,000</span></td><td><span class="badge amber">Must-Do</span></td></tr>
+          <tr><td>EDS</td><td>Bus Wrap + Seat Branding</td><td>4 buses to Dubai Sports City</td><td>4 buses</td><td>4 weeks</td><td class="mono">500K-650K/bus</td><td><span class="badge green">AED 177,000</span></td><td><span class="badge amber">Must-Do</span></td></tr>
+          <tr><td>Yellow Media</td><td>Bus Wrap (Single)</td><td>DIC Metro → Sports City via Cricket Stadium</td><td>1 bus</td><td>1 month</td><td class="mono">—</td><td><span class="badge blue">AED 40,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>EDS</td><td>Taxi Advertising</td><td>200 taxis, all across Dubai. Incl. RTA/DM approval</td><td>200 taxis</td><td>4 weeks</td><td class="mono">140M/month</td><td><span class="badge green">AED 160,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr style="background:rgba(245,158,11,0.05)"><td colspan="8" style="color:var(--accent4);font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">🏙️ Outdoor / Billboards (EDS / Yellow Media / Clear Vision)</td></tr>
+          <tr><td>Yellow Media</td><td>Bridge Banner — Sheikh Zayed Rd LED</td><td>1st interchange, near Dubai Mall/Burj Khalifa, 550K daily</td><td>1 face</td><td>1 month</td><td class="mono">550K/day</td><td><span class="badge amber">AED 205,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>Yellow Media</td><td>Bridge Banner — Al Khail / Business Bay</td><td>Backlit, 60M×2.4M, 200K daily</td><td>1 face</td><td>1 month</td><td class="mono">200K/day</td><td><span class="badge amber">AED 230,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>Yellow Media</td><td>SZR Bridge Network — 4 LED Bridges</td><td>Marina Gate → Mall of Emirates, 1.5M daily, 8s/80s loop</td><td>4 faces</td><td>1 month</td><td class="mono">1.5M/day</td><td><span class="badge amber">AED 580,000</span></td><td><span class="badge blue">Good-to-have</span></td></tr>
+          <tr><td>EDS</td><td>Bridge Banner — MBZ Mirdiff (STATIC)</td><td>Mohammad Bin Zayed 4th Interchange, Sharjah→Dubai</td><td>1 face</td><td>4 weeks</td><td class="mono">9M/month</td><td><span class="badge amber">AED 197,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>Yellow Media</td><td>Bridge Banner — Abu Dhabi (LED)</td><td>Khaleej Al Arabi St, closest to Abu Dhabi Cricket Stadium</td><td>1 face</td><td>1 month</td><td class="mono">250K/day</td><td><span class="badge amber">AED 195,000</span></td><td><span class="badge blue">Good-to-have</span></td></tr>
+          <tr><td>EDS</td><td>Lamppost — Hessa Street</td><td>24 faces, targeting Sports City traffic</td><td>24 faces</td><td>4 weeks</td><td class="mono">5.5M/banner</td><td><span class="badge amber">AED 397,000</span></td><td><span class="badge amber">Must-Do</span></td></tr>
+          <tr><td>EDS</td><td>Lamppost — Dubai Sports City</td><td>80 faces (4 circuits), stadium entrances</td><td>80 faces</td><td>4 weeks</td><td class="mono">150K-200K/banner</td><td><span class="badge amber">AED 339,000</span></td><td><span class="badge amber">Must-Do</span></td></tr>
+          <tr><td>EDS</td><td>Rooftop Billboard — Al Karama</td><td>Near LULU entrance, Karama Park</td><td>1 face</td><td>4 weeks</td><td class="mono">2.5-3M/month</td><td><span class="badge blue">AED 75,000</span></td><td><span class="badge amber">Must-Do</span></td></tr>
+          <tr><td>EDS</td><td>LED Billboard — Hessa St (2 faces)</td><td>Infront of JVC, Al Khail Road → Sports City</td><td>2 faces</td><td>4 weeks</td><td class="mono">55.5M/month</td><td><span class="badge blue">AED 119,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>EDS</td><td>3 Screens Network (SZR+Hessa+Umm Suq.)</td><td>8s/60s loop, 3 locations, dominance</td><td>3 faces</td><td>4 weeks</td><td class="mono">120M+/month</td><td><span class="badge blue">AED 159,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>EDS</td><td>Hoarding — MBZ (STATIC)</td><td>Infront of Production City, 100×13m</td><td>1 face</td><td>4 weeks</td><td class="mono">12M/month</td><td><span class="badge blue">AED 269,000</span></td><td><span class="badge blue">Good-to-have</span></td></tr>
+          <tr><td>EDS</td><td>MUPI Network (60 faces)</td><td>50 digital + 10 static, across Dubai</td><td>60 faces</td><td>4 weeks</td><td class="mono">15-25M/month</td><td><span class="badge blue">AED 125,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>EDS</td><td>ENOC Petrol Stations</td><td>49 stations, 1,025 LED screens, 15s/3min loop</td><td>1,025 screens</td><td>1 month</td><td class="mono">—</td><td><span class="badge blue">AED 200,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>Clear Vision</td><td>Gold Souk — Digital LED Screen</td><td>14.4m×6.3m, Deira Enrichment Project</td><td>1 face</td><td>1 month</td><td class="mono">—</td><td><span class="badge blue">AED 50,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>Clear Vision</td><td>Gold Souk — Bridge LED Screen</td><td>22 faces, 8m×1m and 4m×1m panels</td><td>22 faces</td><td>1 month</td><td class="mono">—</td><td><span class="badge blue">AED 50,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>Clear Vision</td><td>Mobile Trucks (4 trucks)</td><td>12 hours/day, 5m×1.5m sides</td><td>4 trucks</td><td>1 month</td><td class="mono">—</td><td><span class="badge blue">AED 50,000</span></td><td><span class="badge blue">Medium</span></td></tr>
+          <tr><td>Clear Vision</td><td>Walking Billboards</td><td>5 hrs/day, 560mm×1350mm panels</td><td>2 people</td><td>Per day</td><td class="mono">—</td><td><span class="badge blue">AED 850/person/day</span></td><td><span class="badge blue">Medium</span></td></tr>
+          <tr style="background:rgba(124,58,237,0.05)"><td colspan="8" style="color:var(--accent2);font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">📻 Radio (Phase Two / Multiple Frames)</td></tr>
+          <tr><td>Multiple Frames</td><td>City 101.6 FM (Hindi, #1 Bollywood)</td><td>70 spots/month, 30s · 1.1M weekly reach · 25-50 yrs</td><td>210 spots/3mo</td><td>3 months</td><td class="mono">—</td><td><span class="badge purple">AED 23,616/mo → AED 70,848 (3mo)</span></td><td><span class="badge amber">Must-Do</span></td></tr>
+          <tr><td>Multiple Frames</td><td>HIT FM 96.7 (Malayalam)</td><td>70 spots/month, 30s · 409K weekly reach · Kerala expats</td><td>210 spots/3mo</td><td>3 months</td><td class="mono">—</td><td><span class="badge purple">AED 12,466/mo → AED 37,399 (3mo)</span></td><td><span class="badge amber">Must-Do</span></td></tr>
+          <tr><td>Phase Two</td><td>Kadak FM 88.8 (Hindi)</td><td>280 spots, 2 weeks · Dubai/Abu Dhabi/Al Ain</td><td>280 spots</td><td>2 weeks</td><td class="mono">—</td><td><span class="badge purple">AED 75,300</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>Phase Two</td><td>Talk 100.3 FM (Official Asia Cup station)</td><td>Live commentary, boundary sweepers, 500K daily listeners</td><td>20 days</td><td>20 days</td><td class="mono">500K/day</td><td><span class="badge purple">AED 145,000</span></td><td><span class="badge amber">Must-Do (Asia Cup)</span></td></tr>
+          <tr><td>Phase Two</td><td>Radio 4 FM 89.1 (Co-Sponsorship)</td><td>180 spots, branded sweepers, RJ mentions</td><td>4 weeks</td><td>4 weeks</td><td class="mono">1.6M (80% male)</td><td><span class="badge purple">AED 53,550</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr style="background:rgba(239,68,68,0.05)"><td colspan="8" style="color:var(--accent5);font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">📺 TV / Print / Digital PR</td></tr>
+          <tr><td>Eden Films FZE</td><td>Zee Keralam (Linear TV)</td><td>60 RODP spots + 14 opening/closing credits</td><td>6 weeks</td><td>6 weeks</td><td class="mono">34% South Asian Female</td><td><span class="badge red">AED 80,000</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>Jio Cinema</td><td>Asianet ME — Bigg Boss Malayalam (Powered By)</td><td>270 spots + 1,400 brand tags, 4 weeks</td><td>4 weeks</td><td>4 weeks</td><td class="mono">4.4M monthly reach</td><td><span class="badge red">AED 92,813</span></td><td><span class="badge blue">High</span></td></tr>
+          <tr><td>Multiple Frames</td><td>Khaleej Times (Weekly Articles)</td><td>1 article/week, 12 weeks</td><td>12 articles</td><td>12 weeks</td><td class="mono">6.5M monthly website</td><td><span class="badge red">AED 88,200</span></td><td><span class="badge blue">Medium</span></td></tr>
+          <tr><td>Yellow Media</td><td>Gulf News (Article + 3 Instagram Posts)</td><td>500 words + backlink + 3 IG posts</td><td>1 article</td><td>—</td><td class="mono">650K unique/mo</td><td><span class="badge red">AED 11,650</span></td><td><span class="badge blue">Medium</span></td></tr>
+          <tr><td>Yellow Media</td><td>Khaleej Times (Article + 3 Instagram Posts)</td><td>500 words + backlink + 3 IG posts (1.1M followers)</td><td>1 article</td><td>—</td><td class="mono">1.1M followers</td><td><span class="badge red">AED 13,900</span></td><td><span class="badge blue">Medium</span></td></tr>
+          <tr><td>Multiple Frames</td><td>In-Cinema (Star Cinemas + Vox)</td><td>UAE cinemas South Asian audience</td><td>—</td><td>Sept</td><td class="mono">—</td><td><span class="badge red">AED 150,000</span></td><td><span class="badge blue">Medium</span></td></tr>
+          <tr><td>Next Solutions</td><td>Media Takeover (Full Social Package)</td><td>40 influencers, 10 creatives, 4 reels, Khaleej + Gulf News</td><td>4 weeks</td><td>4 weeks</td><td class="mono">—</td><td><span class="badge purple">$17,857 + VAT</span></td><td><span class="badge blue">High</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- UK / LONDON -->
+<div class="section" id="uk">
+  <div class="section-hdr">
+    <div class="section-title">🇬🇧 UK / London — Media Rates & OOH Proposals<small>Real Aspora vendor data · TfL Underground · Roadside · Linear TV · Dec 2025</small></div>
+    <span class="period-badge">Source: London Dec 2025 OOH Proposal + ATL Planning Sheet</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-label">London Tube Total Campaign (inc. VAT)</div>
+      <div class="kpi-value blue">£47,589</div>
+      <div class="kpi-sub">211 sites · 12.18M impressions</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Bus Shelter Total (inc. VAT)</div>
+      <div class="kpi-value green">£75,769</div>
+      <div class="kpi-sub">286 sites · 35.7M impressions</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">UK South Asian TV Package</div>
+      <div class="kpi-value amber">£112,268</div>
+      <div class="kpi-sub">~18M impressions · 13 weeks</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">48-Sheet Billboard (per site/2wk)</div>
+      <div class="kpi-value purple">£1,125</div>
+      <div class="kpi-sub">Market rate: £1,730. 57% saving</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">LEP (Escalator Panel) per site/2wk</div>
+      <div class="kpi-value blue">£57</div>
+      <div class="kpi-sub">Market rate: £88. 170 sites optioned</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">London Proximity Tube (21M impr.)</div>
+      <div class="kpi-value green">£37,007</div>
+      <div class="kpi-sub">Media £32,600 + Production £4,407</div>
+    </div>
+  </div>
+
+  <div class="charts-row big">
+    <div class="chart-card">
+      <div class="chart-title">London OOH — Cost vs Impressions by Format <span class="info-tag">Actual Aspora Dec 2025 proposal</span></div>
+      <div class="chart-wrap" style="height:300px"><canvas id="ukOOHChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">UK South Asian TV Channels — Budget Split</div>
+      <div class="chart-wrap"><canvas id="ukTVChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="charts-row three">
+    <div class="chart-card">
+      <div class="chart-title">Tube Stations Optioned (Dec 2025)</div>
+      <div class="chart-wrap"><canvas id="ukStationsChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">UK ATL Budget Breakdown (Sep Plan, £)</div>
+      <div class="chart-wrap"><canvas id="ukATLChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">CPM Comparison — London OOH Formats</div>
+      <div class="chart-wrap"><canvas id="ukCPMChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header">🏷️ UK Complete Rate Card — Actual Aspora Proposals (Dec 2025)</div>
+    <div class="table-body">
+      <table class="data-table">
+        <thead><tr><th>Channel</th><th>Format / Product</th><th>Location</th><th>Sites/Qty</th><th>Period</th><th>Impressions</th><th>Market Rate</th><th>Proposed Rate</th><th>Total (ex VAT)</th></tr></thead>
+        <tbody>
+          <tr style="background:rgba(0,212,255,0.05)"><td colspan="9" style="color:var(--accent);font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">🚇 London Underground / TfL</td></tr>
+          <tr><td>TfL Underground</td><td>48 Sheet</td><td>Harrow on the Hill</td><td>1</td><td>1st–14th Dec</td><td class="mono">400,000</td><td class="mono">£1,730/site</td><td class="mono">£1,125/site</td><td><span class="badge blue">£1,125</span></td></tr>
+          <tr><td>TfL Underground</td><td>16 Sheet</td><td>Redbridge, Hounslow West, Gants Hill, Harrow</td><td>38</td><td>1st–14th Dec</td><td class="mono">2,133,000</td><td class="mono">£625/site</td><td class="mono">£406/site</td><td><span class="badge blue">£15,428</span></td></tr>
+          <tr><td>TfL Underground</td><td>12 Sheet</td><td>Upton Park, Hounslow East</td><td>2</td><td>1st–14th Dec</td><td class="mono">320,000</td><td class="mono">£576/site</td><td class="mono">£375/site</td><td><span class="badge blue">£750</span></td></tr>
+          <tr><td>TfL Underground</td><td>LEP (Lift & Escalator Panels)</td><td>Upton Pk, Wembley, Hounslow, Gants Hill, Greenford, Harrow</td><td>170</td><td>15th–28th Dec</td><td class="mono">9,324,000</td><td class="mono">£88/site</td><td class="mono">£57.12/site</td><td><span class="badge blue">£9,710</span></td></tr>
+          <tr><td>TfL Underground</td><td>48 Sheets</td><td>Sudbury Hill, Manor Park</td><td>4</td><td>15th–28th Dec</td><td class="mono">—</td><td class="mono">£1,730/site</td><td class="mono">£1,125/site</td><td><span class="badge blue">£4,500</span></td></tr>
+          <tr><td>TfL Underground</td><td>16 Sheet</td><td>Sudbury Hill</td><td>1</td><td>15th–28th Dec</td><td class="mono">—</td><td class="mono">£625/site</td><td class="mono">£406/site</td><td><span class="badge blue">£406</span></td></tr>
+          <tr><td>TfL Underground</td><td>6 Sheet</td><td>Ilford, Southall</td><td>2</td><td>15th–28th Dec</td><td class="mono">—</td><td class="mono">—</td><td class="mono">£361/site</td><td><span class="badge blue">£722</span></td></tr>
+          <tr><td colspan="8" style="text-align:right;color:var(--text2);font-size:0.78rem;font-weight:600;">Tube Totals (Media + Prod, exc. VAT)</td><td><span class="badge green">£39,657</span></td></tr>
+          <tr><td colspan="8" style="text-align:right;color:var(--text3);font-size:0.75rem;">Including 20% VAT</td><td><span class="badge amber">£47,589</span></td></tr>
+          <tr style="background:rgba(16,185,129,0.05)"><td colspan="9" style="color:var(--accent3);font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">🚌 Bus Shelter / Roadside</td></tr>
+          <tr><td>TfL Bus Shelter</td><td>Paper 6 Sheet</td><td>East Ham, Forest Gate, Harrow, Hillingdon, Hounslow, Ilford, Pinner, Southall, Wembley, Northwood</td><td>256</td><td>1st–14th Dec</td><td class="mono">33,188,750</td><td class="mono">£350/site</td><td class="mono">£181.84/site</td><td><span class="badge green">£46,551</span></td></tr>
+          <tr><td>TfL Bus Shelter</td><td>Digital 6 Sheet (12s/0.15 SOV)</td><td>Same South Asian areas</td><td>30</td><td>1st–14th Dec</td><td class="mono">2,533,908</td><td class="mono">£750/site</td><td class="mono">£553/site</td><td><span class="badge green">£16,590</span></td></tr>
+          <tr><td colspan="8" style="text-align:right;color:var(--text2);font-size:0.78rem;font-weight:600;">Bus Shelter Totals (exc. VAT)</td><td><span class="badge green">£63,141</span></td></tr>
+          <tr><td colspan="8" style="text-align:right;color:var(--text3);font-size:0.75rem;">Including 20% VAT</td><td><span class="badge amber">£75,769</span></td></tr>
+          <tr style="background:rgba(124,58,237,0.05)"><td colspan="9" style="color:var(--accent2);font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">📡 Linear TV / OTT (UK)</td></tr>
+          <tr><td>TV Agency</td><td>Sky Sports Cricket</td><td>UK · 3 weeks</td><td>—</td><td>3 weeks</td><td class="mono">3,489,468</td><td class="mono">—</td><td class="mono">—</td><td><span class="badge purple">£25,025</span></td></tr>
+          <tr><td>TV Agency</td><td>South Asian Channels (Colors, Sony, Zee, B4U etc.)</td><td>Sky & Virgin · 59% UK homes</td><td>—</td><td>13 weeks</td><td class="mono">6,483,453</td><td class="mono">—</td><td class="mono">—</td><td><span class="badge purple">£45,045</span></td></tr>
+          <tr><td>TV Agency</td><td>PTC Punjabi, Pitaara, Punjab TV</td><td>Sky & Virgin</td><td>—</td><td>13 weeks</td><td class="mono">3,995,494</td><td class="mono">—</td><td class="mono">—</td><td><span class="badge purple">£7,007</span></td></tr>
+          <tr><td>TV Agency</td><td>Aaj Tak, NTV</td><td>UK</td><td>—</td><td>13 weeks</td><td class="mono">3,051,967</td><td class="mono">—</td><td class="mono">—</td><td><span class="badge purple">£5,005</span></td></tr>
+          <tr><td>TV Agency</td><td>Yupp TV OTT (Star Plus, Colors, Asianet etc.)</td><td>Smart TV apps · Samsung, LG, Sony</td><td>30s spots</td><td>13 weeks</td><td class="mono">1,387,235</td><td class="mono">—</td><td class="mono">—</td><td><span class="badge purple">£30,030</span></td></tr>
+          <tr><td colspan="8" style="text-align:right;color:var(--text2);font-size:0.78rem;font-weight:600;">Total UK TV (inc. agency fee)</td><td><span class="badge amber">£112,268 (~$152,195)</span></td></tr>
+          <tr style="background:rgba(245,158,11,0.05)"><td colspan="9" style="color:var(--accent4);font-size:0.72rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;">📣 ATL Plan — UK (September Budget)</td></tr>
+          <tr><td>UK ATL</td><td>Billboard — 48 Sheet</td><td>London</td><td>—</td><td>Sept</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td><span class="badge amber">£25,000</span></td></tr>
+          <tr><td>UK ATL</td><td>Billboard — 6 Sheet</td><td>London</td><td>—</td><td>Sept</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td><span class="badge amber">£15,000</span></td></tr>
+          <tr><td>UK ATL</td><td>DOOH</td><td>London</td><td>—</td><td>Sept</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td><span class="badge amber">£15,000</span></td></tr>
+          <tr><td>UK ATL</td><td>Bus Wraps (T-sides)</td><td>London</td><td>—</td><td>Sept</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td><span class="badge amber">£40,000</span></td></tr>
+          <tr><td>UK ATL</td><td>Lyca Radio</td><td>South Asian UK</td><td>—</td><td>Aug–Sept</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td><span class="badge amber">£5,000</span></td></tr>
+          <tr><td>UK ATL</td><td>TV Ads</td><td>UK South Asian</td><td>—</td><td>Aug–Sept</td><td class="mono">—</td><td class="mono">—</td><td class="mono">—</td><td><span class="badge amber">£55,000</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-top:1rem;">
+    <div style="font-size:0.78rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1rem;">🔑 UK South Asian Diaspora — Media Planning Notes</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+      <div>
+        <div style="font-size:0.82rem;color:var(--accent);font-weight:600;margin-bottom:4px;">Target Tube Stations</div>
+        <div style="font-size:0.8rem;color:var(--text2);line-height:1.6;">Stations selected for South Asian proximity: Upton Park, Gants Hill, Redbridge, Hounslow West & East, Harrow on the Hill, Wembley Park, Greenford, Southall. All optioned as of Dec 2025.</div>
+      </div>
+      <div>
+        <div style="font-size:0.82rem;color:var(--accent3);font-weight:600;margin-bottom:4px;">TV Reach (India)</div>
+        <div style="font-size:0.8rem;color:var(--text2);line-height:1.6;">Sky &amp; Virgin combined reach 59% of all UK homes. The Aspora TV plan generates 18M+ impressions via South Asian channels. Estimated reach: 38% of the Indian population in the UK.</div>
+      </div>
+      <div>
+        <div style="font-size:0.82rem;color:var(--accent4);font-weight:600;margin-bottom:4px;">Proximity Discounts</div>
+        <div style="font-size:0.8rem;color:var(--text2);line-height:1.6;">Proximity buying achieves ~43% discount vs market rate (e.g. 16 Sheet: £406 vs £625 market). LEPs offer highest volume/impact at £57/site. Paper 6 Sheets deliver 100% SOV on bus shelters.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GEO -->
+<div class="section" id="geo">
+  <div class="section-hdr">
+    <div class="section-title">Geographic Performance<small>United States · State-Level Campaign Data</small></div>
+    <span class="period-badge">Display + Prime Video · Dec 2025 – Jan 2026</span>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-label">Top Display State</div>
+      <div class="kpi-value blue" style="font-size:1.4rem">Texas</div>
+      <div class="kpi-sub">504,609 impressions</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Top Prime Video State</div>
+      <div class="kpi-value green" style="font-size:1.4rem">California</div>
+      <div class="kpi-sub">113,294 impressions</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Best Display CTR State</div>
+      <div class="kpi-value amber" style="font-size:1.4rem">Ohio</div>
+      <div class="kpi-sub">0.232% CTR</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Best Prime CTR State</div>
+      <div class="kpi-value purple" style="font-size:1.4rem">Colorado</div>
+      <div class="kpi-sub">0.122% CTR</div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">Display — Top 10 States by Impressions</div>
+      <div class="chart-wrap"><canvas id="geoDisplayChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Prime Video — Top 10 States by Impressions</div>
+      <div class="chart-wrap"><canvas id="geoPrimeChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="geo-grid">
+    <div class="table-card">
+      <div class="table-header">Display — State Performance</div>
+      <div class="table-body">
+        <table class="data-table">
+          <thead><tr><th>State</th><th>Impressions</th><th>Clicks</th><th>CTR</th></tr></thead>
+          <tbody>
+            <tr><td>Texas</td><td class="mono">504,609</td><td class="mono">838</td><td><span class="badge green">0.166%</span></td></tr>
+            <tr><td>California</td><td class="mono">417,936</td><td class="mono">763</td><td><span class="badge green">0.183%</span></td></tr>
+            <tr><td>Florida</td><td class="mono">361,370</td><td class="mono">799</td><td><span class="badge green">0.221%</span></td></tr>
+            <tr><td>New York</td><td class="mono">268,441</td><td class="mono">614</td><td><span class="badge green">0.229%</span></td></tr>
+            <tr><td>Illinois</td><td class="mono">248,507</td><td class="mono">457</td><td><span class="badge blue">0.184%</span></td></tr>
+            <tr><td>Georgia</td><td class="mono">242,331</td><td class="mono">439</td><td><span class="badge blue">0.181%</span></td></tr>
+            <tr><td>Pennsylvania</td><td class="mono">227,307</td><td class="mono">506</td><td><span class="badge green">0.223%</span></td></tr>
+            <tr><td>Virginia</td><td class="mono">203,461</td><td class="mono">311</td><td><span class="badge blue">0.153%</span></td></tr>
+            <tr><td>Ohio</td><td class="mono">198,629</td><td class="mono">460</td><td><span class="badge amber">0.232%</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-header">Prime Video — State Performance</div>
+      <div class="table-body">
+        <table class="data-table">
+          <thead><tr><th>State</th><th>Impressions</th><th>VCR</th><th>CTR</th></tr></thead>
+          <tbody>
+            <tr><td>California</td><td class="mono">113,294</td><td><span class="badge green">98.6%</span></td><td class="mono">0.062%</td></tr>
+            <tr><td>Washington</td><td class="mono">112,088</td><td><span class="badge green">98.8%</span></td><td class="mono">0.095%</td></tr>
+            <tr><td>Texas</td><td class="mono">105,949</td><td><span class="badge green">98.8%</span></td><td class="mono">0.066%</td></tr>
+            <tr><td>Colorado</td><td class="mono">62,339</td><td><span class="badge green">98.8%</span></td><td><span class="badge amber">0.122%</span></td></tr>
+            <tr><td>Oregon</td><td class="mono">59,406</td><td><span class="badge green">98.9%</span></td><td class="mono">0.093%</td></tr>
+            <tr><td>Ohio</td><td class="mono">55,005</td><td><span class="badge green">98.9%</span></td><td class="mono">0.098%</td></tr>
+            <tr><td>Illinois</td><td class="mono">54,463</td><td><span class="badge green">98.7%</span></td><td class="mono">0.099%</td></tr>
+            <tr><td>Virginia</td><td class="mono">53,472</td><td><span class="badge green">98.7%</span></td><td class="mono">0.118%</td></tr>
+            <tr><td>New York</td><td class="mono">48,267</td><td><span class="badge blue">98.5%</span></td><td class="mono">0.029%</td></tr>
+            <tr><td>Missouri</td><td class="mono">47,022</td><td><span class="badge green">99.1%</span></td><td class="mono">0.083%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+// ─── CHART DEFAULTS ───
+Chart.defaults.color = '#64748b';
+Chart.defaults.borderColor = '#2a3245';
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.plugins.legend.labels.boxWidth = 10;
+Chart.defaults.plugins.legend.labels.padding = 14;
+
+const COLORS = {
+  blue: '#00d4ff', purple: '#7c3aed', green: '#10b981', amber: '#f59e0b', red: '#ef4444',
+  blue2: 'rgba(0,212,255,0.15)', purple2: 'rgba(124,58,237,0.15)', green2: 'rgba(16,185,129,0.15)', amber2: 'rgba(245,158,11,0.15)',
+};
+
+// ─── TAB NAVIGATION ───
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function showUSSection(id, el) {
+  document.querySelectorAll('.us-subsection').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.inv-pills .pill').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).style.display = 'block';
+  el.classList.add('active');
+}
+
+// ─── GEOGRAPHY FILTER → NAVIGATE ───
+function navigateToMarket(val) {
+  const map = { us: 'us', uae: 'uae', uk: 'uk', all: 'overview' };
+  if (!map[val]) return;
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(map[val]).classList.add('active');
+  // highlight matching nav button
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + map[val] + "'")) b.classList.add('active');
+  });
+}
+
+// ─── METRIC FILTER → UPDATE OVERVIEW CHART ───
+const overviewMetricData = {
+  impressions: {
+    labels: ['Sling TV / CTV', 'Display Ads', 'Prime Video', 'Sony SET HD', 'TV9 Telugu'],
+    data: [1020000, 6610069, 1382989, 85000, 310000],
+    label: 'Impressions',
+    color: 'rgba(0,212,255,0.7)'
+  },
+  ctr: {
+    labels: ['Display Ads', 'Prime Video', 'Sling TV / CTV', 'Sony SET HD', 'Social'],
+    data: [0.208, 0.084, 0, 0, 0.15],
+    label: 'CTR (%)',
+    color: 'rgba(245,158,11,0.7)'
+  },
+  completion: {
+    labels: ['Sling TV / CTV', 'Prime Video', 'Display', 'Sony SET HD', 'Social'],
+    data: [98.99, 98.78, 0, 100, 0],
+    label: 'Completion Rate (%)',
+    color: 'rgba(16,185,129,0.7)'
+  },
+  cost: {
+    labels: ['Dubai Metro (4wk)', 'UK TV Package', 'Dubai Radio (3mo)', 'UK Bus Shelter', 'London Tube', 'US Display'],
+    data: [1651167, 151562, 108247, 63141, 39657, 0],
+    label: 'Spend (local currency)',
+    color: 'rgba(124,58,237,0.7)'
+  }
+};
+
+function switchOverviewMetric(val) {
+  const d = overviewMetricData[val];
+  if (!d) return;
+  const chart = Chart.getChart('overviewChannelChart');
+  if (!chart) return;
+  chart.data.labels = d.labels;
+  chart.data.datasets[0].data = d.data;
+  chart.data.datasets[0].label = d.label;
+  chart.data.datasets[0].backgroundColor = d.color;
+  chart.data.datasets[0].borderColor = d.color.replace('0.7','1');
+  chart.update();
+}
+
+// ─── SEARCH TOGGLE ───
+function toggleSearch() {
+  const body = document.getElementById('searchBody');
+  const btn = document.getElementById('searchToggle');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    btn.textContent = '▲ hide';
+  } else {
+    body.style.display = 'none';
+    btn.textContent = '▼ search';
+  }
+}
+
+// ─── KNOWLEDGE BASE for search ───
+const MEDIA_KB = `
+You are a media intelligence assistant for Aspora, a fintech/NRI banking brand. 
+Answer concisely with exact rates and key facts. Use tables when comparing multiple options. Be specific about currencies and durations.
+Format numbers clearly (e.g. "AED 250,000" not "250000 AED").
+
+VERIFIED RATE DATA:
+
+=== BURJ KHALIFA, DUBAI ===
+- Weekday 3-min LED display (8-10pm): AED 250,000–350,000 (~$68K–$95K)
+- Weekend 3-min LED display (8-10pm): AED 350,000–450,000 (~$95K–$122K)
+- Double 3-min (same night, 8-10pm): AED 500,000–580,000
+- 5× 3-min displays (7pm–midnight, any night): AED 1,000,000
+- Special events (New Year's Eve, National Day): AED 1,300,000+
+- Booking: Via Mullen Lowe MENA. 4-week content approval lead time. No personal milestones. Full payment in advance. Cannot sync with Dubai Fountain.
+- Minimum duration: 3 minutes. Display window: evenings only (7pm–midnight).
+
+=== TIMES SQUARE, NEW YORK ===
+- Standard digital 30-sec shared loop: $1,000–$5,000/day (10–15 rotations/hr)
+- Standard digital 15-sec shared loop: $300–$1,000/day (88+ plays/day)
+- Premium "Bowtie" location (Broadway & 7th, 42nd–47th St): $20,000–$50,000/week
+- Full-day exclusive takeover: $10,000–$50,000 depending on screen
+- Vertical LED billboard (55ft×31ft), Broadway Plaza: ~$27,000/4 weeks
+- Static backlit bulletin (26ft×24ft): ~$11,000/4 weeks
+- Marriott Marquis billboard: $300,000/4 weeks
+- Non-prime digital screen: $50,000/4 weeks for 15-sec loop
+- Full building takeover (One Times Square, Nasdaq): $1.1M–$4M/year
+- Entry-level (personal/promo, small screen): $150–$500/day (15 sec every hour)
+- Production costs extra: $5,000–$50,000 for creative. Static install: $80,000–$100,000.
+
+=== CANARY WHARF TUBE STATION, LONDON ===
+- Annual footfall: 47 million passengers/year (Jubilee line)
+- Daily workers in area: ~90,000 (Barclays, HSBC, Citigroup HQs)
+- Platform 16 Sheet: £406/site per 2 weeks (market rate: £625)
+- 48 Sheet Cross-Track: £1,125–£2,400/site per 2 weeks
+- LEP (Escalator Panels): £57–£88/site per 2 weeks
+- 6 Sheet: £361–£400/site per 2 weeks
+- Digital Screen: £553–£750/site per 2 weeks
+- Full Station Domination: £50,000–£150,000+ per 2 weeks
+- Formats: 6 sheets, 12 sheets, 16 sheets, 48 sheets, LCD screens, ticket gateways, silver centres, whole platform takeover, tube car panels
+- Also available outside: Canary Wharf Shopping Mall digital screens, DLR station (separate line), outdoor street-level sites in Canada Square estate, Crossrail Place
+- ABC1 audience, high dwell time, 3 min avg on platform
+
+=== LONDON UNDERGROUND GENERAL RATES (2025) ===
+- Cat 1 stations (Oxford Circus, King's Cross, Waterloo, Liverpool St): 48-sheet £2,200–£3,500/site/2wks
+- Cat 2–3 (Victoria, Bond St, Bank): 48-sheet £1,400–£2,400/site/2wks
+- Cat 3–4 (Camden, Angel, Canary Wharf): 48-sheet £950–£1,600/site/2wks
+- Zone 3–6: 48-sheet £750–£1,000/site/2wks
+- 16 Sheet any station: £400–£625/site/2wks
+- 6 Sheet: £361–£400/site
+- LEP (escalator panels): £57–£88/site/2wks
+- Tube Car Panels: from £10/panel
+- Full network LEP (800 panels, 2wks): £32,000 media cost
+- Full network Car Panels (2,200 panels, 2wks): £22,000
+- Station takeover: £50,000–£500,000+
+- Typical minimum campaign budget: ~£15,000
+
+=== ASPORA ACTUAL UAE VENDOR RATES ===
+- Dubai Metro Full Domination (8 stations, 4wks): AED 1,651,167 incl. VAT (Multiple Frames)
+  - Screen Walls (656 panels): AED 657,000
+  - Elevator Wraps: AED 350,000
+  - Ticket Gates: AED 325,000
+  - In-Train Overhead (250 panels): AED 240,000
+- Metro 70 Illuminated Faces (Yellow Media): AED 201,500/month
+- Bus Wrap 10 buses (EDS): AED 362,000/4wks
+- Bus Wrap + Seats 4 buses: AED 177,000/4wks
+- Taxi 200 units (EDS): AED 160,000/4wks
+- SZR Bridge Network 4 LEDs (Yellow Media): AED 580,000/month
+- Bridge Banner SZR LED: AED 205,000/month
+- Bridge Banner Al Khail/Business Bay: AED 230,000/month
+- Hessa St Lampposts 24 faces (EDS): AED 397,000/4wks
+- Sports City Lampposts 80 faces (EDS): AED 339,000/4wks
+- Al Karama Rooftop (EDS): AED 75,000/4wks
+- MUPI Network 60 faces (EDS): AED 125,000/4wks
+- ENOC Petrol 49 stations, 1025 screens (Yellow): AED 200,000/month
+- Gold Souk LED Screen (Clear Vision): AED 50,000/month
+- City 101.6 FM (Multiple Frames): AED 23,616/month (70 spots)
+- HIT FM 96.7 (Multiple Frames): AED 12,466/month (70 spots)
+- Talk 100.3 FM Asia Cup package (Yellow): AED 145,000/20 days
+- Khaleej Times articles (Multiple Frames): AED 88,200/12 weeks
+- Social Media Takeover (Next Solutions): $17,857 + VAT
+
+=== ASPORA ACTUAL UK VENDOR RATES ===
+- London Tube total (211 sites, 2 weeks): £39,657 excl VAT / £47,589 incl VAT
+- Bus Shelter paper 6-sheet 256 sites: £46,551 excl VAT
+- Bus Shelter digital 6-sheet 30 sites: £16,590 excl VAT
+- UK South Asian TV total package: £112,268 (incl agency fee)
+  - Sky Sports Cricket (3wks): £25,025
+  - Colors/Sony/Zee etc (13wks): £45,045
+  - PTC Punjabi/Pitaara (13wks): £7,007
+  - Aaj Tak/NTV (13wks): £5,005
+  - Yupp TV OTT (13wks): £30,030
+
+=== DUBAI MARKET RATES (General) ===
+- SZR static billboard: AED 60,000–120,000/4wks
+- SZR digital screen: AED 80,000–400,000/4wks
+- Dubai Mall Atrium LED: AED 85,000–145,000/week
+- Dubai Hills Mall Atrium LED: AED 85,000–145,000/week
+- Dubai Frame: AED 30,000–80,000 est. (via Dubai Municipality)
+- DXB Airport terminal premium: AED 40,000–150,000/month
+
+=== ASPORA US CAMPAIGN BENCHMARKS (Internal) ===
+- Sling TV CTV: 1,020,000 ads served / 98.99% completion / 18 channels / 5 weeks
+- Amazon Prime Video: 1,382,989 impressions / 98.78% VCR / 0.084% CTR
+- Display Network: 6,610,069 impressions / 0.208% CTR / 13,746 clicks
+- Sony SET HD: Linear placements on Indian Idol and India's Got Talent
+
+Answer only questions about media advertising rates, inventory, and campaign planning. If asked something outside this, politely redirect.
+`;
+
+// ─── AI SEARCH ───
+async function runSearch() {
+  const input = document.getElementById('searchInput').value.trim();
+  if (!input) return;
+  
+  const resultDiv = document.getElementById('searchResult');
+  const answerDiv = document.getElementById('searchAnswer');
+  resultDiv.style.display = 'block';
+  answerDiv.innerHTML = '<span class="search-spinner"></span> Searching media rates...';
+  
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: MEDIA_KB,
+        messages: [{ role: 'user', content: input }]
+      })
+    });
+    
+    const data = await response.json();
+    const text = data.content?.[0]?.text || 'No answer available.';
+    
+    // Format the response: convert markdown tables and bold
+    let formatted = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--text)">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/^(#{1,3})\s+(.+)$/gm, (_,h,t) => `<div style="font-weight:700;color:var(--accent);margin:8px 0 4px;font-size:${h.length===1?'0.9rem':'0.83rem'}">${t}</div>`)
+      .replace(/
+
+/g, '<br><br>')
+      .replace(/
+/g, '<br>');
+    
+    // Convert markdown tables to HTML
+    if (formatted.includes('|')) {
+      formatted = formatted.replace(/(<br>)?\|(.+)\|(<br>)?/g, (match) => {
+        const rows = match.split('<br>').filter(r => r.includes('|'));
+        let table = '<table class="answer-table">';
+        rows.forEach((row, i) => {
+          if (row.includes('---')) return;
+          const cells = row.split('|').filter(c => c.trim());
+          const tag = i === 0 ? 'th' : 'td';
+          table += '<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>';
+        });
+        return table + '</table>';
+      });
+    }
+    
+    answerDiv.innerHTML = formatted;
+  } catch(e) {
+    answerDiv.innerHTML = '<span style="color:var(--accent5)">Search unavailable. Check connection.</span>';
+  }
+}
+
+function quickSearch(el) {
+  document.getElementById('searchInput').value = el.textContent;
+  runSearch();
+}
+
+
+function applyFilters() { /* filters would update data in full version */ }
+
+// ─── DATA ───
+const slingChannels = [
+  {name:'Colors',ads:81370,done:80574,cat:'General Entertainment'},
+  {name:'Star Plus',ads:78048,done:76874,cat:'General Entertainment'},
+  {name:'Star Gold',ads:67209,done:66765,cat:'Movies'},
+  {name:'Star Bharat',ads:66319,done:66173,cat:'General Entertainment'},
+  {name:'Times Now',ads:60828,done:60291,cat:'News'},
+  {name:'India Today',ads:59329,done:58532,cat:'News'},
+  {name:'Star Ma',ads:57857,done:57280,cat:'Regional'},
+  {name:'Star Ma Gold',ads:57472,done:56723,cat:'Movies'},
+  {name:'NDTV',ads:56380,done:55884,cat:'News'},
+  {name:'Star Vijay',ads:52891,done:52524,cat:'Regional'},
+  {name:'PTC Punjab',ads:49046,done:48682,cat:'Regional'},
+  {name:'Asianet',ads:48964,done:48403,cat:'Regional'},
+  {name:'Raj TV',ads:48963,done:48217,cat:'Regional'},
+  {name:'Star Jalsa Bangla',ads:47126,done:46680,cat:'Regional'},
+  {name:'News 18',ads:46019,done:45484,cat:'News'},
+  {name:'Shemaroo Gujrat',ads:45667,done:45340,cat:'Regional'},
+  {name:'Cine Plex',ads:42543,done:42048,cat:'Movies'},
+  {name:'Aajtak',ads:51458,done:50777,cat:'News'},
+];
+
+const weeklyData = {
+  labels:['Dec 8–14','Dec 15–21','Dec 22–28','Dec 29–Jan 4','Jan 5–11'],
+  ads:[101540,231309,263723,235543,185374],
+};
+
+// ─── OVERVIEW CHARTS ───
+new Chart(document.getElementById('overviewChannelChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Sling CTV\n(18 Channels)','Amazon Prime\nVideo','Ad Network\nDisplay','Sony SET HD\n(Linear)','TV9 Telugu\n(Social)'],
+    datasets:[{
+      label:'Impressions',
+      data:[1017489,1382989,6610069,85000,55300],
+      backgroundColor:[COLORS.blue2,COLORS.purple2,COLORS.amber2,COLORS.green2,COLORS.red+40],
+      borderColor:[COLORS.blue,COLORS.purple,COLORS.amber,COLORS.green,COLORS.red],
+      borderWidth:1.5,borderRadius:6,
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v}}}}
+});
+
+new Chart(document.getElementById('overviewCompChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Sling CTV','Amazon Prime','Industry Benchmark\n(CTV Low)','Industry Benchmark\n(CTV High)'],
+    datasets:[{
+      label:'Completion Rate %',
+      data:[98.99,98.78,92,97],
+      backgroundColor:[COLORS.blue2,COLORS.purple2,'rgba(100,116,139,0.2)','rgba(100,116,139,0.2)'],
+      borderColor:[COLORS.blue,COLORS.purple,'#64748b','#64748b'],
+      borderWidth:1.5,borderRadius:6,
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{min:88,max:100,grid:{color:'rgba(42,50,69,0.5)'}}}}
+});
+
+new Chart(document.getElementById('overviewCTRChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Display\nCampaign','Prime Video','Search\n(Industry)','Social\n(Facebook)','CTV\n(Industry)'],
+    datasets:[{
+      label:'CTR %',
+      data:[0.208,0.084,6.66,2.0,0.84],
+      backgroundColor:[COLORS.amber2,COLORS.purple2,'rgba(16,185,129,0.15)','rgba(0,212,255,0.1)','rgba(124,58,237,0.15)'],
+      borderColor:[COLORS.amber,COLORS.purple,COLORS.green,COLORS.blue,COLORS.purple],
+      borderWidth:1.5,borderRadius:6,
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'}}}}
+});
+
+new Chart(document.getElementById('overviewWeeklyChart').getContext('2d'),{
+  type:'line',
+  data:{
+    labels:weeklyData.labels,
+    datasets:[{
+      label:'Ads Served',
+      data:weeklyData.ads,
+      borderColor:COLORS.blue,backgroundColor:'rgba(0,212,255,0.08)',
+      tension:0.4,fill:true,pointBackgroundColor:COLORS.blue,pointRadius:4,
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{callback:v=>(v/1000).toFixed(0)+'K'}}}}
+});
+
+new Chart(document.getElementById('overviewDeviceChart').getContext('2d'),{
+  type:'doughnut',
+  data:{
+    labels:['Mobile (Phone)','Desktop (PC)','Tablet'],
+    datasets:[{
+      data:[5232886,926774,450409],
+      backgroundColor:[COLORS.blue2,COLORS.green2,COLORS.amber2],
+      borderColor:[COLORS.blue,COLORS.green,COLORS.amber],
+      borderWidth:1.5,
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:true,cutout:'65%',plugins:{legend:{position:'bottom'}}}
+});
+
+// ─── CTV CHARTS ───
+const ctvCRs = slingChannels.map(c => (c.done/c.ads*100).toFixed(2));
+new Chart(document.getElementById('ctvChannelChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:slingChannels.map(c=>c.name),
+    datasets:[
+      {label:'Completion Rate %',data:ctvCRs,backgroundColor:ctvCRs.map(v=>v>=99?COLORS.green2:COLORS.blue2),borderColor:ctvCRs.map(v=>v>=99?COLORS.green:COLORS.blue),borderWidth:1.5,borderRadius:4},
+      {label:'Benchmark (97%)',data:Array(18).fill(97),type:'line',borderColor:'rgba(245,158,11,0.6)',borderDash:[4,4],pointRadius:0,borderWidth:1.5},
+    ]
+  },
+  options:{
+    indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'top'}},
+    scales:{x:{min:96,max:100,grid:{color:'rgba(42,50,69,0.5)'}},y:{grid:{display:false},ticks:{font:{size:10}}}}
+  }
+});
+
+new Chart(document.getElementById('ctvWeeklyTrend').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:weeklyData.labels,
+    datasets:[
+      {label:'Total Ads',data:weeklyData.ads,backgroundColor:COLORS.blue2,borderColor:COLORS.blue,borderWidth:1.5,borderRadius:4},
+      {label:'Completions',data:weeklyData.ads.map(v=>Math.round(v*0.9899)),backgroundColor:COLORS.green2,borderColor:COLORS.green,borderWidth:1.5,borderRadius:4}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{callback:v=>(v/1000).toFixed(0)+'K'}}}}
+});
+
+// CTV Table
+const tbody = document.getElementById('ctvChannelTable');
+slingChannels.sort((a,b)=>(b.done/b.ads)-(a.done/a.ads)).forEach(c => {
+  const cr = (c.done/c.ads*100).toFixed(3);
+  const maxAds = Math.max(...slingChannels.map(x=>x.ads));
+  const barW = Math.round(c.ads/maxAds*120);
+  tbody.innerHTML += `<tr>
+    <td style="color:var(--text)">${c.name}</td>
+    <td><span class="info-tag">${c.cat}</span></td>
+    <td class="mono"><div class="bar-cell"><div class="mini-bar" style="width:${barW}px"></div>${c.ads.toLocaleString()}</div></td>
+    <td class="mono">${c.done.toLocaleString()}</td>
+    <td><span class="badge ${cr>=99?'green':'blue'}">${cr}%</span></td>
+  </tr>`;
+});
+
+new Chart(document.getElementById('ctvPieChart').getContext('2d'),{
+  type:'doughnut',
+  data:{
+    labels:slingChannels.map(c=>c.name),
+    datasets:[{
+      data:slingChannels.map(c=>c.ads),
+      backgroundColor:['rgba(0,212,255,0.7)','rgba(124,58,237,0.7)','rgba(16,185,129,0.7)','rgba(245,158,11,0.7)','rgba(239,68,68,0.7)','rgba(59,130,246,0.7)','rgba(168,85,247,0.7)','rgba(34,197,94,0.7)','rgba(251,191,36,0.7)','rgba(248,113,113,0.7)','rgba(99,102,241,0.7)','rgba(236,72,153,0.7)','rgba(14,165,233,0.7)','rgba(22,163,74,0.7)','rgba(234,179,8,0.7)','rgba(220,38,38,0.7)','rgba(139,92,246,0.7)','rgba(6,182,212,0.7)'],
+      borderColor:'var(--surface)',borderWidth:2,
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:true,cutout:'50%',plugins:{legend:{display:false}}}
+});
+
+// ─── LINEAR TV ───
+new Chart(document.getElementById('linearShowChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Indian Idol\n(30 Min)','India\'s Got\nTalent (30 Min)'],
+    datasets:[{label:'Spots Placed',data:[5,3],backgroundColor:[COLORS.blue2,COLORS.purple2],borderColor:[COLORS.blue,COLORS.purple],borderWidth:1.5,borderRadius:6}]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{stepSize:1}}}}
+});
+
+new Chart(document.getElementById('linearDaypartChart').getContext('2d'),{
+  type:'doughnut',
+  data:{
+    labels:['Prime Time (10PM+)','Pre-Prime (8–10PM)','Promos (Offset)'],
+    datasets:[{data:[6,2,2],backgroundColor:[COLORS.amber2,COLORS.blue2,COLORS.green2],borderColor:[COLORS.amber,COLORS.blue,COLORS.green],borderWidth:1.5}]
+  },
+  options:{responsive:true,maintainAspectRatio:true,cutout:'60%',plugins:{legend:{position:'bottom'}}}
+});
+
+// ─── PRIME VIDEO ───
+new Chart(document.getElementById('primeCreativeChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['15-Second Creative','30-Second Creative'],
+    datasets:[
+      {label:'Impressions',data:[730875,652114],backgroundColor:[COLORS.blue2,COLORS.purple2],borderColor:[COLORS.blue,COLORS.purple],borderWidth:1.5,borderRadius:6,yAxisID:'y'},
+      {label:'CTR %',data:[0.062,0.108],backgroundColor:'transparent',borderColor:[COLORS.amber,COLORS.green],borderWidth:2,type:'line',yAxisID:'y1',pointRadius:6,pointBackgroundColor:[COLORS.amber,COLORS.green]},
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{callback:v=>v.toLocaleString()}},y1:{position:'right',grid:{display:false},ticks:{callback:v=>v.toFixed(3)+'%'}}}}
+});
+
+new Chart(document.getElementById('primeGeoChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['California','Washington','Texas','Colorado','Oregon','Ohio','Illinois','Virginia','New York','Missouri'],
+    datasets:[{label:'Impressions',data:[113294,112088,105949,62339,59406,55005,54463,53472,48267,47022],backgroundColor:COLORS.purple2,borderColor:COLORS.purple,borderWidth:1.5,borderRadius:4}]
+  },
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(42,50,69,0.5)'}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
+});
+
+new Chart(document.getElementById('primeAudienceChart').getContext('2d'),{
+  type:'doughnut',
+  data:{
+    labels:['Children 10-12','Children 4-6','Children 0-3','Other Segments'],
+    datasets:[{data:[36133,22271,6448,67023],backgroundColor:[COLORS.blue2,COLORS.purple2,COLORS.green2,COLORS.amber2],borderColor:[COLORS.blue,COLORS.purple,COLORS.green,COLORS.amber],borderWidth:1.5}]
+  },
+  options:{responsive:true,maintainAspectRatio:true,cutout:'55%',plugins:{legend:{position:'bottom'}}}
+});
+
+new Chart(document.getElementById('primeVCRChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Missouri','Oregon','Ohio','Washington','Texas','Colorado','Illinois','Virginia','California','New York'],
+    datasets:[
+      {label:'VCR %',data:[99.1,98.9,98.9,98.8,98.8,98.8,98.7,98.7,98.6,98.5],backgroundColor:COLORS.green2,borderColor:COLORS.green,borderWidth:1.5,borderRadius:4},
+      {label:'Benchmark 95%',data:Array(10).fill(95),type:'line',borderColor:'rgba(245,158,11,0.5)',borderDash:[4,4],pointRadius:0}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{y:{min:93,max:100,grid:{color:'rgba(42,50,69,0.5)'}}}}
+});
+
+// ─── DISPLAY ───
+new Chart(document.getElementById('displayDeviceChart').getContext('2d'),{
+  type:'doughnut',
+  data:{
+    labels:['Mobile/Phone','Desktop/PC','Tablet'],
+    datasets:[{data:[5232886,926774,450409],backgroundColor:[COLORS.blue2,COLORS.green2,COLORS.amber2],borderColor:[COLORS.blue,COLORS.green,COLORS.amber],borderWidth:1.5}]
+  },
+  options:{responsive:true,maintainAspectRatio:true,cutout:'60%',plugins:{legend:{position:'bottom'}}}
+});
+
+new Chart(document.getElementById('displayCTRDeviceChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Mobile','Tablet','Desktop'],
+    datasets:[
+      {label:'Aspora CTR %',data:[0.245,0.097,0.053],backgroundColor:[COLORS.blue2,COLORS.amber2,COLORS.green2],borderColor:[COLORS.blue,COLORS.amber,COLORS.green],borderWidth:1.5,borderRadius:6},
+      {label:'Industry Benchmark',data:[0.38,0.15,0.05],backgroundColor:'transparent',borderColor:['rgba(245,158,11,0.5)','rgba(245,158,11,0.5)','rgba(245,158,11,0.5)'],borderWidth:1.5,type:'line',borderDash:[4,4],pointRadius:5,pointBackgroundColor:COLORS.amber}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'}}}}
+});
+
+new Chart(document.getElementById('displayGeoChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Texas','California','Florida','New York','Illinois','Georgia','Pennsylvania','Virginia','Ohio','New Jersey'],
+    datasets:[{label:'Impressions',data:[504609,417936,361370,268441,248507,242331,227307,203461,198629,175000],backgroundColor:COLORS.amber2,borderColor:COLORS.amber,borderWidth:1.5,borderRadius:4}]
+  },
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{callback:v=>(v/1000).toFixed(0)+'K'}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
+});
+
+new Chart(document.getElementById('displayStateCTRChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Ohio','New York','Florida','Pennsylvania','California','Illinois','Georgia','Texas','Virginia'],
+    datasets:[
+      {label:'CTR %',data:[0.232,0.229,0.221,0.223,0.183,0.184,0.181,0.166,0.153],backgroundColor:COLORS.blue2,borderColor:COLORS.blue,borderWidth:1.5,borderRadius:4},
+      {label:'Avg 0.208%',data:Array(9).fill(0.208),type:'line',borderColor:'rgba(16,185,129,0.5)',borderDash:[4,4],pointRadius:0}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'}}}}
+});
+
+// ─── SOCIAL ───
+new Chart(document.getElementById('tv9ViewsChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Dec 21\n(V1)','Dec 21\n(V2)','Dec 22\n(V1)','Dec 22\n(V2)','Dec 23','Dec 24','Dec 28'],
+    datasets:[{label:'YouTube Views',data:[31000,2100,4400,5600,3200,7800,4100],backgroundColor:COLORS.blue2,borderColor:COLORS.blue,borderWidth:1.5,borderRadius:4}]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{callback:v=>v>=1000?(v/1000).toFixed(1)+'K':v}}}}
+});
+
+new Chart(document.getElementById('socialBenchChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['YouTube\n(5–15%)','Facebook\n(2–5%)','Instagram\n(1–3%)','TikTok\n(1–2%)','Twitter/X\n(0.5–1.5%)','LinkedIn\n(0.5–1%)'],
+    datasets:[{label:'Avg CTR Range (Mid)',data:[10,3.5,2,1.5,1,0.75],backgroundColor:[COLORS.red+60,COLORS.blue2,COLORS.purple2,COLORS.green2,COLORS.amber2,'rgba(99,102,241,0.15)'],borderColor:[COLORS.red,COLORS.blue,COLORS.purple,COLORS.green,COLORS.amber,'rgba(99,102,241,0.8)'],borderWidth:1.5,borderRadius:6}]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'}}}}
+});
+
+// ─── OOH ───
+new Chart(document.getElementById('oohCPMChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Times Square\nDOOH','Airport Int\'l\nTerminal','Mall / Retail\nDOOH','Subway /\nTransit','Wallscapes\n(Urban)','Bus Shelter','Highway\nBillboard','Gas Station\nDOOH'],
+    datasets:[
+      {label:'Min CPM ($)',data:[40,20,10,8,10,5,3,3],backgroundColor:COLORS.blue2,borderColor:COLORS.blue,borderWidth:1.5,borderRadius:[4,4,4,4,4,4,4,4]},
+      {label:'Max CPM ($)',data:[80,75,40,30,25,20,8,15],backgroundColor:COLORS.purple2,borderColor:COLORS.purple,borderWidth:1.5,borderRadius:[4,4,4,4,4,4,4,4]},
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'},title:{display:true,text:'CPM ($)',color:'#64748b'}}}}
+});
+
+new Chart(document.getElementById('oohRecallChart').getContext('2d'),{
+  type:'radar',
+  data:{
+    labels:['Brand Recall','Reach','Cost Efficiency','Dwell Time','Audience Targeting','Creative Impact'],
+    datasets:[
+      {label:'Digital OOH',data:[85,90,65,70,75,88],backgroundColor:'rgba(0,212,255,0.1)',borderColor:COLORS.blue,pointBackgroundColor:COLORS.blue,borderWidth:2},
+      {label:'Traditional OOH',data:[70,95,85,55,40,72],backgroundColor:'rgba(16,185,129,0.1)',borderColor:COLORS.green,pointBackgroundColor:COLORS.green,borderWidth:2},
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{r:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{color:'#64748b',backdropColor:'transparent'},pointLabels:{color:'#94a3b8',font:{size:10}}}}}
+});
+
+// ─── BENCHMARKS ───
+new Chart(document.getElementById('benchRadarChart').getContext('2d'),{
+  type:'radar',
+  data:{
+    labels:['CTV Completion','Display CTR','Video CTR (Prime)','Mobile CTR','Video Start Rate','Geo Coverage'],
+    datasets:[
+      {label:'Aspora Performance',data:[102,173,70,65,100,88],backgroundColor:'rgba(0,212,255,0.1)',borderColor:COLORS.blue,pointBackgroundColor:COLORS.blue,borderWidth:2},
+      {label:'Industry Benchmark (=100)',data:[100,100,100,100,100,100],backgroundColor:'rgba(245,158,11,0.08)',borderColor:'rgba(245,158,11,0.5)',pointBackgroundColor:COLORS.amber,borderWidth:1.5,borderDash:[4,4]},
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{r:{min:50,max:120,grid:{color:'rgba(42,50,69,0.5)'},ticks:{color:'#64748b',backdropColor:'transparent',stepSize:25},pointLabels:{color:'#94a3b8',font:{size:10}}}}}
+});
+
+new Chart(document.getElementById('benchCTRChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Search Ads\n(Google)','Facebook\nCarousel','YouTube\n(Social)','CTV\n(Industry)','Facebook\nStatic','Display\nRetargeting','Email\nMarketing','Aspora\nDisplay','Programmatic\nBanner','Aspora\nPrime Video'],
+    datasets:[{
+      label:'CTR %',
+      data:[6.66,1.30,10,0.84,0.9,0.9,2.5,0.208,0.08,0.084],
+      backgroundColor:['rgba(16,185,129,0.2)','rgba(0,212,255,0.2)','rgba(239,68,68,0.2)','rgba(124,58,237,0.2)','rgba(0,212,255,0.15)','rgba(245,158,11,0.2)','rgba(16,185,129,0.15)','rgba(245,158,11,0.5)','rgba(100,116,139,0.2)','rgba(124,58,237,0.4)'],
+      borderColor:['#10b981','#00d4ff','#ef4444','#7c3aed','#00d4ff','#f59e0b','#10b981','#f59e0b','#64748b','#7c3aed'],
+      borderWidth:1.5,borderRadius:6,
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'},type:'logarithmic'}}}
+});
+
+new Chart(document.getElementById('benchMatrixChart').getContext('2d'),{
+  type:'bubble',
+  data:{
+    datasets:[
+      {label:'Sling CTV',data:[{x:0.05,y:98.99,r:25}],backgroundColor:'rgba(0,212,255,0.5)',borderColor:COLORS.blue,borderWidth:2},
+      {label:'Amazon Prime',data:[{x:0.084,y:98.78,r:20}],backgroundColor:'rgba(124,58,237,0.5)',borderColor:COLORS.purple,borderWidth:2},
+      {label:'Display (Ad Network)',data:[{x:0.208,y:0,r:30}],backgroundColor:'rgba(245,158,11,0.5)',borderColor:COLORS.amber,borderWidth:2},
+      {label:'Industry CTV Avg',data:[{x:0.05,y:94.5,r:15}],backgroundColor:'rgba(100,116,139,0.3)',borderColor:'#64748b',borderWidth:2,borderDash:[4,4]},
+      {label:'Industry Display Avg',data:[{x:0.12,y:0,r:15}],backgroundColor:'rgba(100,116,139,0.3)',borderColor:'#64748b',borderWidth:2},
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'top'},tooltip:{callbacks:{label:d=>`${d.dataset.label}: CTR ${d.raw.x.toFixed(3)}%, VCR ${d.raw.y>0?d.raw.y.toFixed(1)+'%':'N/A'}`}}},
+    scales:{
+      x:{grid:{color:'rgba(42,50,69,0.5)'},title:{display:true,text:'CTR %',color:'#64748b'},min:0,max:0.35},
+      y:{grid:{color:'rgba(42,50,69,0.5)'},title:{display:true,text:'Video Completion Rate %',color:'#64748b'},min:0,max:100}
+    }
+  }
+});
+
+// ─── UAE ACTUAL CHARTS ───
+new Chart(document.getElementById('uaeActualOOHChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Dubai Metro\n(Full, 8 stations)','SZR Bridge\nNetwork (4 LEDs)','Hessa St\nLampposts (24)','Bus Wrap\n(10 buses)','Sports City\nLampposts (80)','Hoarding\n(MBZ)','Bridge Banner\n(Al Khail/BB)','Bridge Banner\n(SZR LED)','MBZ Bridge\nBanner','Abu Dhabi\nBridge','ENOC Petrol\n(1025 screens)','Bus+Seats\n(4 buses)','Taxi (200)','Metro 70\nFaces','3 Screens\nNetwork','LED Billboard\nHessa (2)'],
+    datasets:[{
+      label:'Campaign Cost (AED)',
+      data:[1651167,580000,397000,362000,339000,269000,230000,205000,197000,195000,200000,177000,160000,201500,159000,119000],
+      backgroundColor:['rgba(0,212,255,0.7)','rgba(0,212,255,0.5)','rgba(245,158,11,0.7)','rgba(16,185,129,0.7)','rgba(245,158,11,0.6)','rgba(124,58,237,0.5)','rgba(245,158,11,0.5)','rgba(0,212,255,0.4)','rgba(124,58,237,0.4)','rgba(245,158,11,0.4)','rgba(16,185,129,0.5)','rgba(16,185,129,0.6)','rgba(16,185,129,0.4)','rgba(0,212,255,0.3)','rgba(0,212,255,0.35)','rgba(124,58,237,0.35)'],
+      borderColor:['#00d4ff','#00d4ff','#f59e0b','#10b981','#f59e0b','#7c3aed','#f59e0b','#00d4ff','#7c3aed','#f59e0b','#10b981','#10b981','#10b981','#00d4ff','#00d4ff','#7c3aed'],
+      borderWidth:1.5,borderRadius:4,
+    }]
+  },
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{callback:v=>v>=1e6?(v/1e6).toFixed(2)+'M':'AED '+(v/1000).toFixed(0)+'K'},title:{display:true,text:'Campaign Cost (AED)',color:'#64748b'}},y:{grid:{display:false},ticks:{font:{size:9}}}}}
+});
+
+new Chart(document.getElementById('uaeMetroChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['In-Station\nScreen Walls','Elevator\nWraps','Ticket\nGates','In-Train\nOverhead','In-Station\nDigital Screens'],
+    datasets:[
+      {label:'Media Cost (AED)',data:[540000,300000,300000,210000,570000],backgroundColor:COLORS.blue2,borderColor:COLORS.blue,borderWidth:1.5,borderRadius:4},
+      {label:'Production (AED)',data:[117000,50000,25000,30000,9000],backgroundColor:COLORS.purple2,borderColor:COLORS.purple,borderWidth:1.5,borderRadius:4},
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:9}}},y:{stacked:true,grid:{color:'rgba(42,50,69,0.5)'},ticks:{callback:v=>'AED '+(v/1000).toFixed(0)+'K'}}}}
+});
+
+new Chart(document.getElementById('uaeRadioChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['City 101.6 FM\n(Hindi, 3mo)','HIT FM 96.7\n(Malayalam, 3mo)','Kadak FM\n(Hindi, 2wks)','City FM\n(2wks)','HIT FM\n(2wks)','Talk 100.3 FM\n(Asia Cup, 20d)','Radio 4 FM\n(4wks)'],
+    datasets:[{label:'Rate (AED)',data:[70848,37399,75300,119700,84652,145000,53550],backgroundColor:[COLORS.purple2,COLORS.blue2,COLORS.green2,COLORS.purple2,COLORS.blue2,COLORS.amber2,COLORS.green2],borderColor:[COLORS.purple,COLORS.blue,COLORS.green,COLORS.purple,COLORS.blue,COLORS.amber,COLORS.green],borderWidth:1.5,borderRadius:4}]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{callback:v=>'AED '+(v/1000).toFixed(0)+'K'}},x:{grid:{display:false},ticks:{font:{size:9}}}}}
+});
+
+new Chart(document.getElementById('uaeImpressionsChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['3 Screens Net\n(SZR+Hessa+USQ)','Taxis (200)','LED Hessa (2)','Bus Network\n(10+4 buses)','Bus Shelter\n400-650K/bus','Metro (70 faces)\n800K/day','MUPI (60 faces)','MBZ Bridge\nBanner'],
+    datasets:[{label:'Monthly Impressions (M)',data:[120,140,55.5,11.25,5.75,24,20,9],backgroundColor:[COLORS.amber2,COLORS.blue2,COLORS.green2,COLORS.green2,COLORS.purple2,COLORS.blue2,COLORS.amber2,COLORS.blue2],borderColor:[COLORS.amber,COLORS.blue,COLORS.green,COLORS.green,COLORS.purple,COLORS.blue,COLORS.amber,COLORS.blue],borderWidth:1.5,borderRadius:4}]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'},title:{display:true,text:'Impressions (Millions)',color:'#64748b'}},x:{grid:{display:false},ticks:{font:{size:9}}}}}
+});
+
+new Chart(document.getElementById('uaeCupBudgetChart').getContext('2d'),{
+  type:'doughnut',
+  data:{
+    labels:['OOH (Outdoor)','Bus & Taxi','Radio','Digital PR/Social','TV/Print'],
+    datasets:[{
+      data:[1636000,539000,245000,65000,100000],
+      backgroundColor:['rgba(0,212,255,0.7)','rgba(16,185,129,0.7)','rgba(124,58,237,0.7)','rgba(245,158,11,0.7)','rgba(239,68,68,0.7)'],
+      borderColor:'var(--surface)',borderWidth:2,
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:true,cutout:'55%',plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:8}},tooltip:{callbacks:{label:d=>`${d.label}: AED ${(d.raw/1000).toFixed(0)}K`}}}}
+});
+
+// ─── UK CHARTS ───
+new Chart(document.getElementById('ukOOHChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Bus Shelter\nPaper 6 Sheet\n(256 sites)','Bus Shelter\nDigital 6\n(30 sites)','Tube\nLEP Panels\n(170 sites)','Tube\n16 Sheet\n(38 sites)','Tube\n48 Sheet\n(4 sites)','Tube\n12 Sheet\n(2 sites)','Tube\n48 Sheet\n(1 site)'],
+    datasets:[
+      {label:'Proposed Media Cost (£)',data:[46551,16590,9710,15428,4500,750,1125],backgroundColor:[COLORS.green2,COLORS.blue2,COLORS.blue2,COLORS.blue2,COLORS.blue2,COLORS.blue2,COLORS.blue2],borderColor:[COLORS.green,COLORS.blue,COLORS.blue,COLORS.blue,COLORS.blue,COLORS.blue,COLORS.blue],borderWidth:1.5,borderRadius:4},
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{callback:v=>'£'+(v/1000).toFixed(0)+'K'},title:{display:true,text:'Media Cost (£)',color:'#64748b'}},x:{grid:{display:false},ticks:{font:{size:9}}}}}
+});
+
+new Chart(document.getElementById('ukTVChart').getContext('2d'),{
+  type:'doughnut',
+  data:{
+    labels:['Yupp TV OTT\n£30,030','South Asian Linear\n(Colors/Sony/Zee)\n£45,045','Sky Sports Cricket\n£25,025','PTC Punjabi/\nPitaara\n£7,007','Aaj Tak/NTV\n£5,005'],
+    datasets:[{
+      data:[30030,45045,25025,7007,5005],
+      backgroundColor:['rgba(0,212,255,0.7)','rgba(124,58,237,0.7)','rgba(16,185,129,0.7)','rgba(245,158,11,0.7)','rgba(239,68,68,0.7)'],
+      borderColor:'var(--surface)',borderWidth:2,
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:true,cutout:'55%',plugins:{legend:{position:'bottom',labels:{font:{size:9},boxWidth:8}},tooltip:{callbacks:{label:d=>`${d.label}: £${(d.raw/1000).toFixed(0)}K`}}}}
+});
+
+new Chart(document.getElementById('ukStationsChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Harrow on\nthe Hill','Gants Hill','Hounslow\nWest','Redbridge','Wembley\nPark','Upton Park','Greenford','Hounslow\nEast','Sudbury\nHill'],
+    datasets:[
+      {label:'1st–14th Dec',data:[5,11,11,11,0,1,0,1,0],backgroundColor:COLORS.blue2,borderColor:COLORS.blue,borderWidth:1.5,borderRadius:4},
+      {label:'15th–28th Dec',data:[77,46,13,0,25,4,5,0,4],backgroundColor:COLORS.green2,borderColor:COLORS.green,borderWidth:1.5,borderRadius:4},
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:9}}},y:{stacked:true,grid:{color:'rgba(42,50,69,0.5)'},title:{display:true,text:'# of Ad Units Optioned',color:'#64748b'}}}}
+});
+
+new Chart(document.getElementById('ukATLChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['TV Ads','Bus Wraps\n(T-sides)','48 Sheet\nBillboard','BTL\nActivation','6 Sheet\nBillboard','DOOH','Flyers','Human\nBillboards','Lyca Radio','Smart\nBillboards'],
+    datasets:[{label:'Budget (£)',data:[55000,40000,25000,20000,15000,15000,15000,15000,5000,5000],backgroundColor:[COLORS.purple2,COLORS.green2,COLORS.blue2,COLORS.amber2,COLORS.blue2,COLORS.blue2,COLORS.green2,COLORS.amber2,COLORS.purple2,COLORS.blue2],borderColor:[COLORS.purple,COLORS.green,COLORS.blue,COLORS.amber,COLORS.blue,COLORS.blue,COLORS.green,COLORS.amber,COLORS.purple,COLORS.blue],borderWidth:1.5,borderRadius:4}]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{callback:v=>'£'+(v/1000).toFixed(0)+'K'}},x:{grid:{display:false},ticks:{font:{size:9}}}}}
+});
+
+new Chart(document.getElementById('ukCPMChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Bus Shelter\nDigital 6','Tube LEP\nPanels','Bus Shelter\nPaper 6','Tube 16\nSheet','Tube 12\nSheet','Tube 48\nSheet (1)','Roadside\nProximity'],
+    datasets:[
+      {label:'Proposed CPM (£)',data:[6.55,1.04,1.40,1.54,2.34,2.81,2.20],backgroundColor:COLORS.blue2,borderColor:COLORS.blue,borderWidth:1.5,borderRadius:4},
+      {label:'Market CPM (£)',data:[15.15,1.76,1.81,1.57,5.5,4.82,3.0],backgroundColor:COLORS.amber2,borderColor:COLORS.amber,borderWidth:1.5,borderRadius:4,type:'line',borderDash:[4,4],pointRadius:5,pointBackgroundColor:COLORS.amber}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{position:'top'}},scales:{y:{grid:{color:'rgba(42,50,69,0.5)'},title:{display:true,text:'CPM (£)',color:'#64748b'}},x:{grid:{display:false},ticks:{font:{size:9}}}}}
+});
+
+new Chart(document.getElementById('geoDisplayChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['Texas','California','Florida','New York','Illinois','Georgia','Pennsylvania','Virginia','Ohio'],
+    datasets:[{label:'Impressions',data:[504609,417936,361370,268441,248507,242331,227307,203461,198629],backgroundColor:COLORS.amber2,borderColor:COLORS.amber,borderWidth:1.5,borderRadius:4}]
+  },
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{callback:v=>(v/1000).toFixed(0)+'K'}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
+});
+
+new Chart(document.getElementById('geoPrimeChart').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['California','Washington','Texas','Colorado','Oregon','Ohio','Illinois','Virginia','New York','Missouri'],
+    datasets:[{label:'Impressions',data:[113294,112088,105949,62339,59406,55005,54463,53472,48267,47022],backgroundColor:COLORS.purple2,borderColor:COLORS.purple,borderWidth:1.5,borderRadius:4}]
+  },
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(42,50,69,0.5)'},ticks:{callback:v=>(v/1000).toFixed(0)+'K'}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
+});
+
+
+}); // end DOMContentLoaded
+</script>
+</body>
+</html>
