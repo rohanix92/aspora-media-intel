@@ -128,6 +128,8 @@ main { max-width:1600px; margin:0 auto; padding:1.5rem 2rem; }
 .badge.green { background:rgba(16,185,129,0.15); color:var(--accent3); }
 .badge.blue { background:rgba(0,212,255,0.1); color:var(--accent); }
 .badge.amber { background:rgba(245,158,11,0.15); color:var(--accent4); }
+.badge.red { background:rgba(239,68,68,0.15); color:var(--accent5); }
+.badge.purple { background:rgba(124,58,237,0.15); color:var(--accent2); }
 
 /* BENCHMARK ROW */
 .benchmark-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:1rem; margin-bottom:1rem; }
@@ -170,7 +172,7 @@ main { max-width:1600px; margin:0 auto; padding:1.5rem 2rem; }
 /* Scrollable chart */
 .table-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
 .table-header { padding:1rem 1.25rem; border-bottom:1px solid var(--border); font-size:0.8rem; font-weight:600; color:var(--text2); text-transform:uppercase; letter-spacing:0.08em; }
-.table-
+.table-body { overflow-x:auto; }
 
 /* Grid 3 */
 .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; margin-bottom:1rem; }
@@ -1192,7 +1194,7 @@ main { max-width:1600px; margin:0 auto; padding:1.5rem 2rem; }
 
 <script>
 
-document.addEventListener('DOMContentLoaded', function() {
+
 // ─── CHART DEFAULTS ───
 Chart.defaults.color = '#64748b';
 Chart.defaults.borderColor = '#2a3245';
@@ -1209,8 +1211,14 @@ const COLORS = {
 function showTab(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  event.currentTarget.classList.add('active');
+  const section = document.getElementById(id);
+  if (section) section.classList.add('active');
+  // Mark matching tab button active
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'")) {
+      b.classList.add('active');
+    }
+  });
 }
 
 function showUSSection(id, el) {
@@ -1430,11 +1438,8 @@ async function runSearch() {
       .replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--text)">$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/^(#{1,3})\s+(.+)$/gm, (_,h,t) => `<div style="font-weight:700;color:var(--accent);margin:8px 0 4px;font-size:${h.length===1?'0.9rem':'0.83rem'}">${t}</div>`)
-      .replace(/
-
-/g, '<br><br>')
-      .replace(/
-/g, '<br>');
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>');
     
     // Convert markdown tables to HTML
     if (formatted.includes('|')) {
@@ -1958,7 +1963,7 @@ new Chart(document.getElementById('geoPrimeChart').getContext('2d'),{
 });
 
 
-}); // end DOMContentLoaded
+
 </script>
 </body>
 </html>
